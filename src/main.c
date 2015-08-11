@@ -26,91 +26,85 @@
 */
 
 /* Includes */
-#define USE_STDPERIPH_DRIVER
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
 
 /* Private macro */
-#define DACBUFFERSIZE         250
-#define WAVEFREQ              880 /* 880Hz --> A5 */
-#define TIMER6_PRESCALER      2     /* produces a 42MHz tick */
-#define TIMER_CLOCK                 84E6 /* TIM6 runs at 84MHz */
+#define GREENLED LED4
 /* Private variables */
-uint16_t DACBuffer[DACBUFFERSIZE];  /* Array for the waveform */
-
 /* Private function prototypes */
-/* Private functions */
+/* Private function prototypes -----------------------------------------------*/
 void RCC_Configuration(void);
-void DMA_Configuration(void);
-void NVIC_Configuration(void);
 void GPIO_Configuration(void);
-void UART_Configuration(void);
-void Timer_Configuration(uint16_t wavPeriod, uint16_t preScaler);
-void DAC_Configuration(void);
-
-uint32_t arr;
-
+void Timer_Configuration(void);
+void NVIC_Configuration(void);
+uint32_t counter=1;//the new pulse value
+uint32_t flag=1;//to determine if you count up or down
 /*******************************************************************************
-* Function Name  : TIM2_IRQHandler
-* Description    : This function handles TIM2 global interrupt request.
-* Input          : None
-* Output         : None
-* Return         : None
+* TIM2_IRQHandler
+* @brief    This function handles TIM2 global interrupt request.
+* @param    None
+* @retval   None
 *******************************************************************************/
 void TIM2_IRQHandler(void)
 {
-  if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
-  {
-    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-    //Do stuff here
-    arr=TIM6->ARR;
-    if(arr==189)
-    {
-      TIM6->ARR=160-1;
-    }
-    else
-    {
-      TIM6->ARR=189;
-    }
-
-  }
-}
-
-
-/**
-**===========================================================================
-**
-**  Abstract: main program
-**
-**===========================================================================
-*/
-int main(void)
-{
-
-      uint32_t fTimer;
-      uint32_t timerFreq;
-      uint16_t timerPeriod;
-      uint16_t n;
-      uint16_t m;
-
-      /* Calculate the gradient of the Sawtooth */
-      m = (uint16_t) ( 4095 / DACBUFFERSIZE);
-      /* Create wave table for sawtooth */
-      for (n = 0; n<DACBUFFERSIZE; n++)
+      /* Check if interrupt has occured */
+      if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
       {
-            //DACBuffer[n] = (uint16_t)(m*n); /* Remember to cast! */
-            DACBuffer[n] = (uint16_t)(((0xFFF+1)/2)*(sin(2*3.14*n/DACBUFFERSIZE)+1));
+            /* Clear interrupt pending bit */
+            TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+
+            /* WHAT EVER YOU NEED TO DO IN THE INTERRUPT HANDLER GOES HERE */
+            GPIO_ToggleBits(GPIOD, GPIO_Pin_15);//toggle the light every second
       }
 
-      /* Calculate frequency of timer */
-      fTimer = WAVEFREQ * DACBUFFERSIZE;
+}
 
-      /* Calculate Tick Rate */
-      timerFreq = TIMER_CLOCK / TIMER6_PRESCALER; /* Timer tick is in Hz */
+/*******************************************************************************
+* TIM3_IRQHandler
+* @brief    This function handles TIM3 global interrupt request.
+* @param    None
+* @retval   None
+*******************************************************************************/
+void TIM3_IRQHandler(void)
+{
+      /* Check if interrupt has occured */
+      if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
+      {
+            /* Clear interrupt pending bit */
+            TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
-      /* Calculate period of Timer */
-      timerPeriod = (uint16_t)( timerFreq / fTimer );
+            /* WHAT EVER YOU NEED TO DO IN THE INTERRUPT HANDLER GOES HERE */
+            if(flag==1)//count up
+            {
+                  counter=counter+1;
+                  if(counter>998)
+                  {
+                        counter=999;
+                        flag=0;//toggle the flag to make it start counting down
+                  }
+            }
+            else if(flag==0)//count down
+            {
+                  counter=counter-1;
+                  if(counter<1)
+                  {
+                        counter=0;
+                        flag=1;//toggle the flag to make it start counting up
+                  }
+            }
+            TIM_SetCompare2(TIM4,counter);//change the PWM pulse to the new counter value
+      }
 
+}
+
+/**
+  * @brief  Main program.
+  * @param  None
+  * @retval Int
+  */
+int main(void)
+{
 
       /* System Clocks Configuration */
       RCC_Configuration();
@@ -122,44 +116,43 @@ int main(void)
       GPIO_Configuration();
 
       /* Timer Configuration */
-      Timer_Configuration( timerPeriod, TIMER6_PRESCALER );
+      Timer_Configuration();
 
-      /* DAC Configuration */
-      DAC_Configuration();
+      /* Forever loop */
+      for (;;)
+      {
+            /* DOES NOTHING HERE */
+      }
 
-      /* DMA Config */
-      DMA_Configuration ();
-      //TIM6->ARR=0;
-
-  /* Infinite loop */
-  while (1)
-  {
-        /* Do nothing... */
-  }
+      /* Program will never get here... */
+      return 0;
 }
 
 /**
   * @brief  Configures the different system clocks.
   * @param  None
-  * @retval : None
+  * @retval None
   */
 void RCC_Configuration(void)
 {
-      /* Enable DMA and GPIOA Clocks */
-      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1 | RCC_AHB1Periph_GPIOA, ENABLE);
 
-      /* Enable DAC1 and TIM6 clocks */
-      RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC | RCC_APB1Periph_TIM6|RCC_APB1Periph_TIM2, ENABLE);
+      /* TIM2, TIM4, TIM3 clock */
+      RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 | RCC_APB1Periph_TIM4|RCC_APB1Periph_TIM3 , ENABLE);
+
+      /* LEDs are on GPIOD */
+      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
 }
 
 /**
-  * @brief  Configures the nested vectored interrupt controller.
+  * @brief  Configures the Nested Vectored interrupt controller.
   * @param  None
-  * @retval : None
+  * @retval None
   */
 void NVIC_Configuration(void)
 {
       NVIC_InitTypeDef NVIC_InitStructure;
+
       /* Enable the TIM2 global Interrupt */
       NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;//set up the interrupt handler for TIM2
       NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -167,135 +160,111 @@ void NVIC_Configuration(void)
       NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
       NVIC_Init(&NVIC_InitStructure);
+
+      /* Enable the TIM3 global Interrupt */
+      NVIC_InitTypeDef NVIC_InitStructure2;
+      NVIC_InitStructure2.NVIC_IRQChannel = TIM3_IRQn;//set up the interrupt handler for TIM3
+      NVIC_InitStructure2.NVIC_IRQChannelPreemptionPriority = 0;
+      NVIC_InitStructure2.NVIC_IRQChannelSubPriority = 1;
+      NVIC_InitStructure2.NVIC_IRQChannelCmd = ENABLE;
+
+      NVIC_Init(&NVIC_InitStructure2);
 }
 
 
 /**
   * @brief  Configures the different GPIO ports.
   * @param  None
-  * @retval : None
+  * @retval None
   */
 void GPIO_Configuration(void)
 {
-      GPIO_InitTypeDef GPIO_InitStruct;
+      GPIO_InitTypeDef GPIO_InitStructure;
 
-      /* Pack the struct */
-      GPIO_InitStruct.GPIO_Speed = GPIO_Mode_AN;
-      GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
-      GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-      GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-      GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+      /* Put your GPIO initialisation here (Hint use 'GPIO_Init function) */
+      /* Configure the GPIO_LED pin */
+      GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;//set up the LED
+      GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+      GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+      GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+      GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
-      /* Call Init function */
-      GPIO_Init(GPIOA, &GPIO_InitStruct);
+      GPIO_Init(GPIOD, &GPIO_InitStructure);
 
+      GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;//set up the orange LED
+      GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//AF=alternating function=PWM
+      GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+      GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);//link the AF pin to the timer
+
+//    GPIO_SetBits(GPIOD, GPIO_Pin_12);
 }
 
+
 /**
-  * @brief  Configures the DMA.
+  * @brief  Configures the Timers
   * @param  None
-  * @retval : None
+  * @retval None
   */
-void DMA_Configuration(void)
+void Timer_Configuration(void)
 {
-      DMA_InitTypeDef DMA_InitStructure;
+      TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+      TIM_OCInitTypeDef TIM_OCInitStruct;
 
-      //Initialize the structure to default values
-      DMA_StructInit(&DMA_InitStructure);
+      /* Put your timer initialisation here */
+      TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
 
-      /* PACK YOUR INIT STRUCT HERE */
-      DMA_InitStructure.DMA_Channel=DMA_Channel_7;
-      DMA_InitStructure.DMA_PeripheralBaseAddr=(uint32_t)(DAC_BASE + 0x08);  //DAC channel1 12-bit right-aligned data holding register (ref manual pg. 264)
-      DMA_InitStructure.DMA_Memory0BaseAddr=(uint32_t)&DACBuffer;
-      DMA_InitStructure.DMA_DIR=DMA_DIR_MemoryToPeripheral;
-      DMA_InitStructure.DMA_BufferSize = DACBUFFERSIZE;
-      DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-      DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-      DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-      DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-      DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-      DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-      DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
-      DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
-      DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-      DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-      /* Call Init function */
-      DMA_Init(DMA1_Stream5, &DMA_InitStructure);
+      TIM_TimeBaseInitStruct.TIM_Period = 10000-1;//TIM2 has a frequency of 1Hz
+      TIM_TimeBaseInitStruct.TIM_Prescaler = 8400-1;
+      TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;
+      TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
 
-      /* Enable DMA */
-      DMA_Cmd(DMA1_Stream5, ENABLE);
+      TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStruct);
 
-}
-
-/**
-  * @brief  Configures the Timers.
-  * @param  wavePeriod (period of timer), preScaler (prescaler for timer)
-  * @retval : None
-  */
-void Timer_Configuration(uint16_t wavPeriod, uint16_t preScaler)
-{
-      TIM_TimeBaseInitTypeDef  TIM_TimeBaseStruct;
-
-      /* pack Timer struct */
-      TIM_TimeBaseStruct.TIM_Period = wavPeriod-1;
-      TIM_TimeBaseStruct.TIM_Prescaler = preScaler-1;
-      TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1;
-      TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
-      TIM_TimeBaseStruct.TIM_RepetitionCounter = 0x0000;
-
-      /* Call init function */
-      TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStruct);
-
-      /* Select Timer to trigger DAC */
-      TIM_SelectOutputTrigger(TIM6, TIM_TRGOSource_Update);
-
-      /* TIM6 enable counter */
-      TIM_Cmd(TIM6, ENABLE);
-
-
-
-      /* pack Timer struct */
-      TIM_TimeBaseStruct.TIM_Period = 10000-1;
-      TIM_TimeBaseStruct.TIM_Prescaler = 8400-1;
-      TIM_TimeBaseStruct.TIM_ClockDivision = 0;
-      TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
-
-      /* Call init function */
-      TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStruct);
-      //set up the interrupt
+      /* TIM interrupt enable */
       TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-      /* TIM6 enable counter */
+
+      /* TIM2 enable counter */
       TIM_Cmd(TIM2, ENABLE);
+      /*timer 3 setup*/
+      TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
+
+      TIM_TimeBaseInitStruct.TIM_Period = 10-1;//TIM3 has a frequency of 1000Hz
+      TIM_TimeBaseInitStruct.TIM_Prescaler = 8400-1;
+      TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;
+      TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+
+      TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStruct);
+
+      /* TIM interrupt enable */
+      TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+
+      /* TIM3 enable counter */
+      TIM_Cmd(TIM3, ENABLE);
+      /* PWM Timer setup */
+      /* Time base configuration */
+      TIM_TimeBaseInitStruct.TIM_Period = 1000-1;//TIM4 has a frequency of 1000Hz
+      TIM_TimeBaseInitStruct.TIM_Prescaler = 84-1;
+      TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;
+      TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+      TIM_TimeBaseInit(TIM4, &TIM_TimeBaseInitStruct);
+
+      /* PWM1 Mode configuration: Channel2 */
+      TIM_OCInitStruct.TIM_OCMode = TIM_OCMode_PWM1;
+      TIM_OCInitStruct.TIM_OutputState = TIM_OutputState_Enable;
+      TIM_OCInitStruct.TIM_Pulse = 100;   /* 10% Duty Cycle as the period counts up to 1000*/
+      TIM_OCInitStruct.TIM_OCPolarity = TIM_OCPolarity_High;
+
+      /* This is needed for initilization of PWM */
+      TIM_OC2Init(TIM4, &TIM_OCInitStruct);
+      TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
+      TIM_ARRPreloadConfig(TIM4, ENABLE);
+
+      /* TIM4 enable counter */
+      TIM_Cmd(TIM4, ENABLE);
+
 }
 
-/**
-  * @brief  Configures the DAC
-  * @param  None
-  * @retval : None
-  */
-void DAC_Configuration(void)
-{
-      DAC_InitTypeDef DAC_InitStruct;
-
-      /* Initialize the DAC_Trigger member */
-      DAC_InitStruct.DAC_Trigger = DAC_Trigger_T6_TRGO;
-      /* Initialize the DAC_WaveGeneration member */
-      DAC_InitStruct.DAC_WaveGeneration = DAC_WaveGeneration_None;
-      /* Initialize the DAC_LFSRUnmask_TriangleAmplitude member */
-      DAC_InitStruct.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
-      /* Initialize the DAC_OutputBuffer member */
-      DAC_InitStruct.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
-
-      /* Init DAC */
-      DAC_Init(DAC_Channel_1, &DAC_InitStruct);
-
-      /* Enable DMA request */
-      DAC_DMACmd(DAC_Channel_1, ENABLE);
-
-      /* Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter. */
-      DAC_Cmd(DAC_Channel_1, ENABLE);
-
-}
 
 /*
  * Callback used by stm32f4_discovery_audio_codec.c.
