@@ -26,7 +26,10 @@ CFLAGS += -I.
 CFLAGS += -I$(STM_COMMON)/Utilities/STM32F4-Discovery
 CFLAGS += -I$(STM_COMMON)/Libraries/CMSIS/Include -I$(STM_COMMON)/Libraries/CMSIS/ST/STM32F4xx/Include
 CFLAGS += -I$(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/inc
-
+CFLAGS += -DUSE_STDPERIPH_DRIVER
+SRCS += $(wildcard $(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/inc/*.h)
+SRCS +=  $(wildcard $(STM_COMMON)/Libraries/STM32F4xx_StdPeriph_Driver/src/*.c)
+#SRCS += -I$(STM_COMMON)/Libraries/CMSIS/Include -I$(STM_COMMON)/Libraries/CMSIS/ST/STM32F4xx/src
 # add startup file to build
 SRCS += $(STM_COMMON)/Libraries/CMSIS/ST/STM32F4xx/Source/Templates/TrueSTUDIO/startup_stm32f4xx.s
 OBJS = $(SRCS:.c=.o)
@@ -48,4 +51,4 @@ clean:
 
 # Flash the STM32F4
 burn: proj
-sudo	$(STLINK)/st-flash write $(PROJ_NAME).bin 0x8000000
+	sudo	$(STLINK)/st-flash write $(PROJ_NAME).bin 0x8000000
