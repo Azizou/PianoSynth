@@ -36,6 +36,9 @@
 /* Private function prototypes -----------------------------------------------*/
 extern uint16_t volume;
 extern uint16_t pitch_index;
+extern uint16_t buttonVal;
+extern uint32_t numWaves;
+
 extern float pitch;
 /* Private functions ---------------------------------------------------------*/
 
@@ -148,12 +151,12 @@ void SysTick_Handler(void)
 void extiAction(uint32_t extiline, uint16_t gpiopin){
 	if(EXTI_GetITStatus(extiline) != RESET)
 	{
-		/* Toggle LED4 */
-		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
-		//set the frequency offset here
-		//		    GPIO_SetBits(GPIOB,gpiopin);
+		pitch_index++;
+		pitch_index %= 88;
 
-		/* Clear the EXTI line 0 pending bit */
+		buttonVal++;
+		buttonVal %= numWaves;
+		STM_EVAL_LEDToggle(LED4);
 		EXTI_ClearITPendingBit(extiline);
 	}
 	else{
@@ -181,15 +184,12 @@ void EXTI9_5_IRQHandler(void){
 	extiAction(EXTI_Line7,GPIO_Pin_7);
 	extiAction(EXTI_Line8,GPIO_Pin_8);
 	extiAction(EXTI_Line9,GPIO_Pin_9);
-
 }
-
 void EXTI15_10_IRQHandler(void){
 	extiAction(EXTI_Line10,GPIO_Pin_10);
 	extiAction(EXTI_Line11,GPIO_Pin_11);
 	extiAction(EXTI_Line12,GPIO_Pin_12);
 	extiAction(EXTI_Line13,GPIO_Pin_13);
-
 	//handle volume button
 	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
 	{
