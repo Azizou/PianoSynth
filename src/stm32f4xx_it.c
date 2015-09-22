@@ -27,12 +27,16 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
+#include "stm32f4_discovery.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
+extern uint16_t volume;
+extern uint16_t pitch_index;
+extern float pitch;
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
@@ -134,6 +138,87 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
+}
+
+
+
+
+
+
+void extiAction(uint32_t extiline, uint16_t gpiopin){
+	if(EXTI_GetITStatus(extiline) != RESET)
+	{
+		/* Toggle LED4 */
+		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
+		//set the frequency offset here
+		//		    GPIO_SetBits(GPIOB,gpiopin);
+
+		/* Clear the EXTI line 0 pending bit */
+		EXTI_ClearITPendingBit(extiline);
+	}
+	else{
+		//		    GPIO_ResetBits(GPIOB,gpiopin);
+	}
+}
+void EXTI0_IRQHandler(void){
+	extiAction(EXTI_Line0,GPIO_Pin_0);
+}
+void EXTI1_IRQHandler(void){
+	extiAction(EXTI_Line1,GPIO_Pin_1);
+}
+void EXTI2_IRQHandler(void){
+	extiAction(EXTI_Line2,GPIO_Pin_2);
+}
+void EXTI3_IRQHandler(void){
+	extiAction(EXTI_Line3,GPIO_Pin_3);
+}
+void EXTI4_IRQHandler(void){
+	extiAction(EXTI_Line4,GPIO_Pin_4);
+}
+void EXTI9_5_IRQHandler(void){
+	extiAction(EXTI_Line5,GPIO_Pin_5);
+	extiAction(EXTI_Line6,GPIO_Pin_6);
+	extiAction(EXTI_Line7,GPIO_Pin_7);
+	extiAction(EXTI_Line8,GPIO_Pin_8);
+	extiAction(EXTI_Line9,GPIO_Pin_9);
+
+}
+
+void EXTI15_10_IRQHandler(void){
+	extiAction(EXTI_Line10,GPIO_Pin_10);
+	extiAction(EXTI_Line11,GPIO_Pin_11);
+	extiAction(EXTI_Line12,GPIO_Pin_12);
+	extiAction(EXTI_Line13,GPIO_Pin_13);
+
+	//handle volume button
+	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+	{
+		/* Toggle LED4 */
+
+		volume++;
+		if(volume>100)
+			volume = 100;
+		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
+		//set the frequency offset here
+		//		    GPIO_SetBits(GPIOB,gpiopin);
+
+		/* Clear the EXTI line 0 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line14);
+	}
+	else
+		EXTI_ClearITPendingBit(EXTI_Line14);
+
+	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+	{
+		volume--;
+		if(volume>100)
+			volume = 0;
+		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
+		//		    GPIO_SetBits(GPIOB,gpiopin);
+		EXTI_ClearITPendingBit(EXTI_Line15);
+	}
+	else
+		EXTI_ClearITPendingBit(EXTI_Line15);
 }
 
 /******************************************************************************/

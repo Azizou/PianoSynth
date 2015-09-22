@@ -68,6 +68,7 @@
 //extern uint16_t pitch_index;
 //extern float pitch_table[];
 float pitch = 880;
+uint16_t volume = 10;
 /* Private variables */
 uint16_t SineWaveBuffer[DACBUFFERSIZE]; 	/* Array for  waveform 1*/
 uint16_t SawtoothBuffer[DACBUFFERSIZE]; 	/* Array for  waveform 2*/
