@@ -164,10 +164,28 @@ void extiAction(uint32_t extiline, uint16_t gpiopin){
 	}
 }
 void EXTI0_IRQHandler(void){
-	extiAction(EXTI_Line0,GPIO_Pin_0);
+	// extiAction(EXTI_Line0,GPIO_Pin_0);
+  if(EXTI_GetITStatus(EXTI_Line0) != RESET)
+  {
+    /* Toggle LED4 */
+    STM_EVAL_LEDToggle(LED4);
+    
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line0);
+  }
 }
 void EXTI1_IRQHandler(void){
-	extiAction(EXTI_Line1,GPIO_Pin_1);
+	// extiAction(EXTI_Line1,GPIO_Pin_1);
+  if(EXTI_GetITStatus(EXTI_Line1) != RESET)
+  {
+    // pitch_index++;
+    // pitch_index %= 88;
+
+    // buttonVal++;
+    // buttonVal %= numWaves;
+    STM_EVAL_LEDToggle(LED3);
+    EXTI_ClearITPendingBit(EXTI_Line1);
+  }
 }
 void EXTI2_IRQHandler(void){
 	extiAction(EXTI_Line2,GPIO_Pin_2);

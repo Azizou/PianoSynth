@@ -51,7 +51,8 @@ int main(void)
 	/* DMA Config --> Takes in a pointer to the waveform buffer */
 	DMA_Configuration ( TriangleWaveTable );
 
-	EXTILines_Config();
+	// EXTILines_Config();
+	EXTILine_Config(GPIO_Pin_1, EXTI_Line1, EXTI_PinSource1, EXTI1_IRQn);
 	/* Infinite loop */
 	while (1)
 	{
@@ -104,6 +105,12 @@ void RCC_Configuration(void){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC | RCC_APB1Periph_TIM6, ENABLE);
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+	
+  /* Enable GPIOA clock */
+  // RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+  /* Enable SYSCFG clock */
+  // RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 }
 
 void NVIC_Configuration(void)
@@ -130,13 +137,13 @@ void GPIO_Configuration(void)
 	/* Call Init function */
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 \
-		  | GPIO_Pin_4 ;/*| GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 \
-		  | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 \
-		  | GPIO_Pin_14 | GPIO_Pin_15;*/
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	// GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	// GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	// GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 \
+	// 	  | GPIO_Pin_4 ;| GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 \
+	// 	  | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 \
+	// 	  | GPIO_Pin_14 | GPIO_Pin_15;
+	// GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 void DMA_Configuration(uint16_t* wavBuffer)
 {
@@ -207,36 +214,42 @@ void DAC_Configuration(void)
 	/* Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter. */
 	DAC_Cmd(DAC_Channel_1, ENABLE);
 }
-void EXTILines_Config(void)
+
+void EXTILine_Config(uint32_t GPIO_Pin, uint32_t EXTI_Lin, uint32_t EXTI_PinSource, uint32_t EXTI_IRQn)
 {
-	EXTI_InitTypeDef   EXTI_InitStructure;
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource0);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource1);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource2);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource3);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource4);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource5);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource6);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource7);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource8);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource9);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource10);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource11);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource12);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource13);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource14);
-//	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOB, EXTI_PinSource15);
+  GPIO_InitTypeDef   GPIO_InitStructure;
+  NVIC_InitTypeDef   NVIC_InitStructure;
+  EXTI_InitTypeDef EXTI_InitStructure;
+  
+  /* Configure PA0 pin as input floating */
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  // GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin;// | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  /* Connect EXTI Line0 to PA0 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource);// | EXTI_PinSource1 | EXTI_PinSource2 | EXTI_PinSource3);
+  // SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource1);
+  // SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
 
   /* Configure EXTI Line0 */
-	EXTI_InitStructure.EXTI_Line = EXTI_Line0 | EXTI_Line1 | EXTI_Line2 | EXTI_Line3 \
-		  | EXTI_Line4 ; /*| EXTI_Line5 | EXTI_Line6 | EXTI_Line7 | EXTI_Line8  \
-		  | EXTI_Line9 | EXTI_Line10 | EXTI_Line11 | EXTI_Line12 | EXTI_Line13 \
-		  | EXTI_Line14 | EXTI_Line15 */
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+  EXTI_InitStructure.EXTI_Line = EXTI_Lin;// | EXTI_Line1 | EXTI_Line2 | EXTI_Line3 ;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI_IRQn;// | EXTI1_IRQn | EXTI2_IRQn;// | EXTI3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
 }
+
 void EVAL_AUDIO_TransferComplete_CallBack(uint32_t pBuffer, uint32_t Size){
   return;
 }
