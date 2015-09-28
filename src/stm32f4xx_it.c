@@ -32,6 +32,7 @@
 /** @addtogroup EXTI_Example
   * @{
   */ 
+extern int delay_flag;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -168,6 +169,7 @@ void EXTI0_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED4);
+    delay_flag = 1;
     
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line0);
@@ -180,7 +182,7 @@ void EXTI1_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED3);
-    
+    delay_flag = 1;
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line1);
   }
@@ -191,7 +193,7 @@ void EXTI2_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED6);
-    
+    delay_flag = 1;
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line2);
   }
@@ -203,7 +205,7 @@ void EXTI3_IRQHandler(void)
     /* Toggle LED4 */
 
     STM_EVAL_LEDToggle(LED3);
-    
+    delay_flag = 1;
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line3);
   }

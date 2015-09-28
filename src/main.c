@@ -21,6 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4_discovery.h"
+#include  "utils.h"
 
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
   * @{
@@ -29,7 +30,7 @@
 /** @addtogroup EXTI
   * @{
   */ 
-
+int delay_flag = 0;
 /* Private typedef -----------------------------------------------------------*/
 EXTI_InitTypeDef   EXTI_InitStructure;
 /* Private define ------------------------------------------------------------*/
@@ -57,19 +58,17 @@ int main(void)
   STM_EVAL_LEDInit(LED6);
 
 
-  /* Configure EXTI Line0 (connected to PA0 pin) in interrupt mode */
   EXTILine_Config();
   EXTILine1_Config();
   while (1)
   {
+  	if(delay_flag){
+  		delay_ms(10);
+  		delay_flag = 0;
+  	}
   }
 }
 
-/**
-  * @brief  Configures EXTI Line0 (connected to PA0 pin) in interrupt mode
-  * @param  None
-  * @retval None
-  */
 void EXTILine_Config(void)
 {
   GPIO_InitTypeDef   GPIO_InitStructure;
@@ -124,13 +123,10 @@ void EXTILine1_Config(void)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;// | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  /* Connect EXTI Line0 to PA0 pin */
-  // SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);// | EXTI_PinSource1 | EXTI_PinSource2 | EXTI_PinSource3);
   SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource1);
-  // SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource2);
 
   /* Configure EXTI Line0 */
   EXTI_InitStructure.EXTI_Line = EXTI_Line1;// | EXTI_Line1 | EXTI_Line2 | EXTI_Line3 ;
@@ -149,35 +145,13 @@ void EXTILine1_Config(void)
 }
 
 #ifdef  USE_FULL_ASSERT
-
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
 void assert_failed(uint8_t* file, uint32_t line)
 { 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
-  /* Infinite loop */
   while (1)
   {
   }
 }
 #endif
-
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
 
 void EVAL_AUDIO_TransferComplete_CallBack(uint32_t pBuffer, uint32_t Size){
   return;
@@ -185,8 +159,4 @@ void EVAL_AUDIO_TransferComplete_CallBack(uint32_t pBuffer, uint32_t Size){
 uint16_t EVAL_AUDIO_GetSampleCallBack(void){
   return -1;
 }
-void delay_ms(uint32_t milli)
-{
-	uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
-	for(; delay != 0; delay--);
-}
+
