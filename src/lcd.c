@@ -1,13 +1,14 @@
 /*
 Copyright (C) Samuel Ginsberg 2004
 Porting to STM32F0 dev board by James Gowans, 2014
+Porting to STM32F4 dev board by Yumin Park, 2015
 LCD lines are as follows:
-LCD_RS = PC14
-LCD_E = PC15
-LCD_D4 = PB8
-LCD_D5 = PB9
-LCD_D6 = PA12
-LCD_D7 = PA15
+LCD_RS = PB4
+LCD_E = PB5
+LCD_D4 = PC6
+LCD_D5 = PC7
+LCD_D6 = PC8
+LCD_D7 = PC9
 */
 
 #include "lcd.h"
@@ -26,12 +27,6 @@ static void lcd_write4bits(uint8_t value);
 //============================================================================
 
 void lcd_string(uint8_t *string_to_print) {
-  /*uint32_t count=0;
-  while (string_to_print[count] != 0) {
-    lcd_put (string_to_print[count], TEXT);
-    delay(43); // a DRAM write requires at least 43 us execution time
-    count++;
-	}*/
 	while(*string_to_print)
 	{
 		lcd_put(*string_to_print++,TEXT);
@@ -51,18 +46,6 @@ void lcd_init () {
   /*This function sets up the port lines for the LCD and initializes
   the LCD module for use.*/
   // set the relevant pins to outputs
-  /*RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  RCC->AHBENR |= RCC_AHBENR_GPIOBEN; 
-  RCC->AHBENR |= RCC_AHBENR_GPIOAEN; 
-  GPIOC->MODER |= GPIO_MODER_MODER14_0;
-  GPIOC->MODER |= GPIO_MODER_MODER15_0;
-  GPIOB->MODER |= GPIO_MODER_MODER8_0;
-  GPIOB->MODER |= GPIO_MODER_MODER9_0;
-  GPIOA->MODER |= GPIO_MODER_MODER12_0;
-  GPIOA->MODER |= GPIO_MODER_MODER15_0;*/
-  
-
-
   RCC->CFGR = RCC_CFGR_SW_HSE;
   RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN|RCC_AHB1ENR_GPIOCEN;
   RCC->CR |= RCC_CR_HSEON;
@@ -98,7 +81,6 @@ void lcd_command (enum LcdCommand command) {
   //Care is taken not to interfere with the other lines on the port.
   lcd_put((uint8_t)command, COMMAND);
   delay(1530); // 1.53 ms is the maximum delay we should need for any command.
-  // TODO: fix the above to have variable lengths as required by different commands.
 }
 
 //============================================================================
@@ -109,9 +91,9 @@ static void lcd_put (uint8_t character, enum TypeOfCharacter ch_type) {
     //and other common characters the ASCII code will produce correct display.
     //Refer to the Hitachi HD44780 datasheet for full character set information.
     if (ch_type == TEXT) {
-        GPIOB->BSRRL |= GPIO_BSRR_BS_5;// pull RS (PC14) high
+        GPIOB->BSRRL |= GPIO_BSRR_BS_5;// pull RS (PB5) high
     } else if (ch_type == COMMAND) {
-        GPIOB->BSRRH |= GPIO_BSRR_BS_5;// pull RS (PC14) low
+        GPIOB->BSRRH |= GPIO_BSRR_BS_5;// pull RS (PB5) low
     }
     // write upper nibble
     lcd_write4bits(character >> 4);
@@ -160,9 +142,9 @@ static void delay(uint32_t microseconds) {
 static void pulse_strobe (void) {
   //Pulse the strobe line of the LCD to indicate that data is ready.
   delay(1);
-  GPIOB->BSRRL |= GPIO_BSRR_BS_4;// pull E (PC15) high
+  GPIOB->BSRRL |= GPIO_BSRR_BS_4;// pull E (PB4) high
   delay(1);
-  GPIOB->BSRRH |= GPIO_BSRR_BS_4;// pull E (PC15) low
+  GPIOB->BSRRH |= GPIO_BSRR_BS_4;// pull E (PB4) low
   delay(1);
 }                     
 
