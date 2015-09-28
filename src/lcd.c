@@ -26,12 +26,17 @@ static void lcd_write4bits(uint8_t value);
 //============================================================================
 
 void lcd_string(uint8_t *string_to_print) {
-  uint32_t count=0;
+  /*uint32_t count=0;
   while (string_to_print[count] != 0) {
     lcd_put (string_to_print[count], TEXT);
     delay(43); // a DRAM write requires at least 43 us execution time
     count++;
-  }
+	}*/
+	while(*string_to_print)
+	{
+		lcd_put(*string_to_print++,TEXT);
+	}
+
 }
 void lcd_two_line_write(uint8_t* line1, uint8_t* line2) {
   lcd_command(LCD_CLEAR_DISPLAY);
@@ -56,27 +61,29 @@ void lcd_init () {
   GPIOA->MODER |= GPIO_MODER_MODER12_0;
   GPIOA->MODER |= GPIO_MODER_MODER15_0;*/
   
-  //RCC->CFGR = RCC_CFGR_SW_HSE;
-  RCC->AHB1ENR = RCC_AHB1ENR_GPIOAEN|RCC_AHB1ENR_GPIOCEN;
-  //RCC->CR |= RCC_CR_HSEON;
+
+
+  RCC->CFGR = RCC_CFGR_SW_HSE;
+  RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN|RCC_AHB1ENR_GPIOCEN;
+  RCC->CR |= RCC_CR_HSEON;
   
   GPIOC->MODER=GPIO_MODER_MODER6_0|GPIO_MODER_MODER7_0|GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0;
-  GPIOA->MODER=GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0;
+  GPIOB->MODER=GPIO_MODER_MODER4_0|GPIO_MODER_MODER5_0;
 
   GPIOC->OSPEEDR = GPIO_OSPEEDER_OSPEEDR6_1 | GPIO_OSPEEDER_OSPEEDR7_1 | GPIO_OSPEEDER_OSPEEDR8_1 | GPIO_OSPEEDER_OSPEEDR9_1;
-  GPIOA->OSPEEDR = GPIO_OSPEEDER_OSPEEDR8_1 | GPIO_OSPEEDER_OSPEEDR9_1;
+  GPIOB->OSPEEDR = GPIO_OSPEEDER_OSPEEDR4_1 | GPIO_OSPEEDER_OSPEEDR5_1;
 
   delay(30000); //allow the LCD 30 ms power up time
   // in case in 2nd nibble of 4 bit tansfer, this goes to 1st nibble
   // if byte in 8-bit mode, keeps in 8-bit mode
-  lcd_write4bits(0x03);   
+  lcd_write4bits(0x03);
   delay(4100);
   lcd_write4bits(0x03);  // garanteed to be byte of 8-bit data for first byte of 4-bit.
   delay(39);
   lcd_write4bits(0x03); // necessary in case this is the 2nd nibble of 4-bit transfer.
   delay(39);
   // switch to 4-bit. This will latch in a byte as it's garanteed to now be in 8-bit
-  lcd_write4bits(0x02);   
+  lcd_write4bits(0x02);
   delay(39);
   lcd_command(LCD_FOUR_BIT_TWO_LINE_MODE); //0x28
   lcd_command(LCD_DISPLAY_OFF); // 0x08
@@ -102,9 +109,9 @@ static void lcd_put (uint8_t character, enum TypeOfCharacter ch_type) {
     //and other common characters the ASCII code will produce correct display.
     //Refer to the Hitachi HD44780 datasheet for full character set information.
     if (ch_type == TEXT) {
-        GPIOA->BSRRL |= GPIO_BSRR_BS_9;// pull RS (PC14) high
+        GPIOB->BSRRL |= GPIO_BSRR_BS_5;// pull RS (PC14) high
     } else if (ch_type == COMMAND) {
-        GPIOA->BSRRH |= GPIO_BSRR_BR_9;// pull RS (PC14) low
+        GPIOB->BSRRH |= GPIO_BSRR_BS_5;// pull RS (PC14) low
     }
     // write upper nibble
     lcd_write4bits(character >> 4);
@@ -117,22 +124,22 @@ static void lcd_write4bits(uint8_t character) {
   if ((character & 0x08) != 0) {
     GPIOC->BSRRL |= GPIO_BSRR_BS_9;
   } else {
-    GPIOC->BSRRH |= GPIO_BSRR_BR_9;
+    GPIOC->BSRRH |= GPIO_BSRR_BS_9;
   }
   if ((character & 0x04) != 0) {
     GPIOC->BSRRL |= GPIO_BSRR_BS_8;
   } else {
-    GPIOC->BSRRH |= GPIO_BSRR_BR_8;
+    GPIOC->BSRRH |= GPIO_BSRR_BS_8;
   }
   if ((character & 0x02) != 0) {
     GPIOC->BSRRL |= GPIO_BSRR_BS_7;
   } else {
-    GPIOC->BSRRH |= GPIO_BSRR_BR_7;
+    GPIOC->BSRRH |= GPIO_BSRR_BS_7;
   } 
   if ((character & 0x01) != 0) {
     GPIOC->BSRRL |= GPIO_BSRR_BS_6;
   } else {
-    GPIOC->BSRRH |= GPIO_BSRR_BR_6;
+    GPIOC->BSRRH |= GPIO_BSRR_BS_6;
   }
   pulse_strobe ();
 }
@@ -153,9 +160,9 @@ static void delay(uint32_t microseconds) {
 static void pulse_strobe (void) {
   //Pulse the strobe line of the LCD to indicate that data is ready.
   delay(1);
-  GPIOA->BSRRL |= GPIO_BSRR_BS_8;// pull E (PC15) high
+  GPIOB->BSRRL |= GPIO_BSRR_BS_4;// pull E (PC15) high
   delay(1);
-  GPIOA->BSRRH |= GPIO_BSRR_BR_8;// pull E (PC15) low
+  GPIOB->BSRRH |= GPIO_BSRR_BS_4;// pull E (PC15) low
   delay(1);
 }                     
 
