@@ -32,6 +32,11 @@
 /** @addtogroup EXTI_Example
   * @{
   */ 
+void delay_ms(uint32_t milli)
+{
+  uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
+  for(; delay != 0; delay--);
+}
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -168,7 +173,7 @@ void EXTI0_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED4);
-    
+    // delay_ms(50);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line0);
   }
@@ -180,7 +185,7 @@ void EXTI1_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED3);
-    
+    delay_ms(50);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line1);
   }
@@ -191,7 +196,7 @@ void EXTI2_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED6);
-    
+    delay_ms(50);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line2);
   }
@@ -203,11 +208,24 @@ void EXTI3_IRQHandler(void)
     /* Toggle LED4 */
 
     STM_EVAL_LEDToggle(LED3);
-    
+    delay_ms(50);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line3);
   }
 }
+void EXTI4_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line4) != RESET)
+  {
+    /* Toggle LED4 */
+
+    STM_EVAL_LEDToggle(LED5);
+    delay_ms(50);
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line4);
+  }
+}
+
 /**
   * @}
   */ 
