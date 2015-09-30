@@ -25,6 +25,8 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
 
+extern uint8_t led_flag;
+extern uint8_t ledd_flag;
 /** @addtogroup STM32F4_Discovery_Peripheral_Examples
   * @{
   */
@@ -185,7 +187,9 @@ void EXTI1_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED3);
-    delay_ms(50);
+    // delay_ms(50);
+  GPIO_SetBits(GPIOA, GPIO_Pin_3);
+
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line1);
   }
@@ -196,7 +200,10 @@ void EXTI2_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED6);
-    delay_ms(50);
+    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
+
+    // delay_ms(50);
+    ledd_flag = 1;
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line2);
   }
