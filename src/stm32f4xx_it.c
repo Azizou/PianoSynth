@@ -27,13 +27,7 @@
 
 extern uint8_t led_flag;
 extern uint8_t ledd_flag;
-/** @addtogroup STM32F4_Discovery_Peripheral_Examples
-  * @{
-  */
 
-/** @addtogroup EXTI_Example
-  * @{
-  */ 
 void delay_ms(uint32_t milli)
 {
   uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
@@ -231,6 +225,13 @@ void EXTI4_IRQHandler(void)
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line4);
   }
+}
+void EXTI9_5_IRQHandler(void){
+
+}
+
+void EXTI15_10_IRQHandler(void){
+
 }
 
 /**
