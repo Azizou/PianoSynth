@@ -38,7 +38,6 @@ void GPIO_Configuration(void);
 void UART_Configuration(void);
 void Timer_Configuration(uint16_t wavPeriod, uint16_t preScaler);
 void DAC_Configuration(void);
-void EXTILines_Config(void);
 void delay_ms(uint32_t milli);
 uint16_t UpdateTimerPeriod(uint16_t tickRate,uint16_t freqTimer);
 uint32_t UpdateTimerFrequency();

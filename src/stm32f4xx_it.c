@@ -1,45 +1,43 @@
 /**
-*****************************************************************************
-**
-**  File        : stm32f4xx_it.c
-**
-**  Abstract    : Main Interrupt Service Routines.
-**                This file provides template for all exceptions handler and
-**                peripherals interrupt service routine.
-**
-**  Environment : Atollic TrueSTUDIO(R)
-**                STMicroelectronics STM32F4xx Standard Peripherals Library
-**
-**  Distribution: The file is distributed “as is,” without any warranty
-**                of any kind.
-**
-**  (c)Copyright Atollic AB.
-**  You may use this file as-is or modify it according to the needs of your
-**  project. Distribution of this file (unmodified or modified) is not
-**  permitted. Atollic AB permit registered Atollic TrueSTUDIO(R) users the
-**  rights to distribute the assembled, compiled & linked contents of this
-**  file as part of an application binary file, provided that it is built
-**  using the Atollic TrueSTUDIO(R) toolchain.
-**
-**
-*****************************************************************************
-*/
+  ******************************************************************************
+  * @file    EXTI/stm32f4xx_it.c 
+  * @author  MCD Application Team
+  * @version V1.0.0
+  * @date    19-September-2011
+  * @brief   Main Interrupt Service Routines.
+  *          This file provides template for all exceptions handler and 
+  *          peripherals interrupt service routine.
+  ******************************************************************************
+  * @attention
+  *
+  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  *
+  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  ******************************************************************************
+  */ 
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
+
+int debounce_delay = 50;
+
+void delay_ms(uint32_t milli)
+{
+  uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
+  for(; delay != 0; delay--);
+}
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-extern uint16_t volume;
-extern uint16_t pitch_index;
-extern uint16_t buttonVal;
-extern uint32_t numWaves;
-
-extern float pitch;
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
@@ -143,84 +141,6 @@ void SysTick_Handler(void)
 {
 }
 
-
-
-
-
-
-void extiAction(uint32_t extiline, uint16_t gpiopin){
-	if(EXTI_GetITStatus(extiline) != RESET)
-	{
-		pitch_index++;
-		pitch_index %= 88;
-
-		buttonVal++;
-		buttonVal %= numWaves;
-		STM_EVAL_LEDToggle(LED4);
-		EXTI_ClearITPendingBit(extiline);
-	}
-	else{
-		//		    GPIO_ResetBits(GPIOB,gpiopin);
-	}
-}
-void EXTI0_IRQHandler(void){
-	extiAction(EXTI_Line0,GPIO_Pin_0);
-}
-void EXTI1_IRQHandler(void){
-	extiAction(EXTI_Line1,GPIO_Pin_1);
-}
-void EXTI2_IRQHandler(void){
-	extiAction(EXTI_Line2,GPIO_Pin_2);
-}
-void EXTI3_IRQHandler(void){
-	extiAction(EXTI_Line3,GPIO_Pin_3);
-}
-void EXTI4_IRQHandler(void){
-	extiAction(EXTI_Line4,GPIO_Pin_4);
-}
-void EXTI9_5_IRQHandler(void){
-	extiAction(EXTI_Line5,GPIO_Pin_5);
-	extiAction(EXTI_Line6,GPIO_Pin_6);
-	extiAction(EXTI_Line7,GPIO_Pin_7);
-	extiAction(EXTI_Line8,GPIO_Pin_8);
-	extiAction(EXTI_Line9,GPIO_Pin_9);
-}
-void EXTI15_10_IRQHandler(void){
-	extiAction(EXTI_Line10,GPIO_Pin_10);
-	extiAction(EXTI_Line11,GPIO_Pin_11);
-	extiAction(EXTI_Line12,GPIO_Pin_12);
-	extiAction(EXTI_Line13,GPIO_Pin_13);
-	//handle volume button
-	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
-	{
-		/* Toggle LED4 */
-
-		volume++;
-		if(volume>100)
-			volume = 100;
-		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
-		//set the frequency offset here
-		//		    GPIO_SetBits(GPIOB,gpiopin);
-
-		/* Clear the EXTI line 0 pending bit */
-		EXTI_ClearITPendingBit(EXTI_Line14);
-	}
-	else
-		EXTI_ClearITPendingBit(EXTI_Line14);
-
-	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
-	{
-		volume--;
-		if(volume>100)
-			volume = 0;
-		STM_EVAL_LEDToggle(LED4);//Try to trigger on rising and falling edges.
-		//		    GPIO_SetBits(GPIOB,gpiopin);
-		EXTI_ClearITPendingBit(EXTI_Line15);
-	}
-	else
-		EXTI_ClearITPendingBit(EXTI_Line15);
-}
-
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
@@ -237,3 +157,194 @@ void EXTI15_10_IRQHandler(void){
 {
 }*/
 
+/**
+  * @brief  This function handles External line 0 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void EXTI0_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line0) != RESET)
+  {
+    /* Toggle LED4 */
+    STM_EVAL_LEDToggle(LED3);
+     delay_ms(debounce_delay);
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line0);
+  }
+}
+
+void EXTI1_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line1) != RESET)
+  {
+    /* Toggle LED4 */
+    STM_EVAL_LEDToggle(LED4);
+     delay_ms(debounce_delay);
+//  GPIO_SetBits(GPIOA, GPIO_Pin_3);
+
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line1);
+  }
+}
+void EXTI2_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line2) != RESET)
+  {
+    /* Toggle LED4 */
+    STM_EVAL_LEDToggle(LED5);
+//    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
+
+    delay_ms(debounce_delay);
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line2);
+  }
+}
+void EXTI3_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line3) != RESET)
+  {
+    /* Toggle LED4 */
+
+    STM_EVAL_LEDToggle(LED6);
+    delay_ms(debounce_delay);
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line3);
+  }
+  else{
+	  STM_EVAL_LEDToggle(LED6);
+  }
+}
+void EXTI4_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line4) != RESET)
+  {
+    /* Toggle LED4 */
+
+    STM_EVAL_LEDToggle(LED3);
+    delay_ms(debounce_delay);
+    /* Clear the EXTI line 0 pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line4);
+  }
+}
+void EXTI9_5_IRQHandler(void){
+	 if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+	{
+	/* Toggle LED4 */
+
+		STM_EVAL_LEDToggle(LED4);
+		delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line5);
+	}
+
+	 else if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED5);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line6);
+	}
+	 if(EXTI_GetITStatus(EXTI_Line7) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED6);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line7);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line8) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED3);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line8);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line9) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line9);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line10) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line10);
+	}
+}
+
+void EXTI15_10_IRQHandler(void){
+	 if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+	{
+	/* Toggle LED4 */
+
+		STM_EVAL_LEDToggle(LED4);
+		delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line5);
+	}
+
+	 else if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED5);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line6);
+	}
+	 if(EXTI_GetITStatus(EXTI_Line7) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED6);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line7);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line8) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED3);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line8);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line9) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line9);
+	}
+}
+
+/**
+  * @}
+  */ 
+
+/**
+  * @}
+  */ 
+
+/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
