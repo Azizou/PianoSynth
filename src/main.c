@@ -52,6 +52,8 @@ int main(void)
 	DMA_Configuration ( TriangleWaveTable );
 
 	EXTILines_Config();
+
+	lcd_init();
 	/* Infinite loop */
 	while (1)
 	{
@@ -61,18 +63,23 @@ int main(void)
 			DMA_Cmd(DMA1_Stream5, DISABLE);	/* Disable the DMA */
 			if(GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_14)== SET){
 				DMA_Configuration ( SawtoothBuffer );
+				lcd_two_line_write("Waveform changed","to Sawtooth");
 			}
 			else if (GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_15)== SET)
 			{
 				DMA_Configuration ( SineWaveBuffer );
+				lcd_two_line_write("Waveform changed","to SineWave");
 			}
 			else if (GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)== SET)
 			{
 				DMA_Configuration ( PulseWaveTable);
+				lcd_two_line_write("Waveform changed","to PulseWave");
+
 			}
 			else if (GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_6)== SET)
 			{
 				DMA_Configuration ( TriangleWaveTable);
+				lcd_two_line_write("Waveform changed","to TriangleWave");
 			}
 			delay_ms(20); //debounce wait for 20ms
 		}
