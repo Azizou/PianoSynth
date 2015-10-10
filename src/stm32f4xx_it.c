@@ -25,8 +25,7 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
 
-extern uint8_t led_flag;
-extern uint8_t ledd_flag;
+int debounce_delay = 50;
 
 void delay_ms(uint32_t milli)
 {
@@ -168,8 +167,8 @@ void EXTI0_IRQHandler(void)
   if(EXTI_GetITStatus(EXTI_Line0) != RESET)
   {
     /* Toggle LED4 */
-    STM_EVAL_LEDToggle(LED4);
-    // delay_ms(50);
+    STM_EVAL_LEDToggle(LED3);
+     delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line0);
   }
@@ -180,9 +179,9 @@ void EXTI1_IRQHandler(void)
   if(EXTI_GetITStatus(EXTI_Line1) != RESET)
   {
     /* Toggle LED4 */
-    STM_EVAL_LEDToggle(LED3);
-    // delay_ms(50);
-  GPIO_SetBits(GPIOA, GPIO_Pin_3);
+    STM_EVAL_LEDToggle(LED4);
+     delay_ms(debounce_delay);
+//  GPIO_SetBits(GPIOA, GPIO_Pin_3);
 
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line1);
@@ -193,11 +192,10 @@ void EXTI2_IRQHandler(void)
   if(EXTI_GetITStatus(EXTI_Line2) != RESET)
   {
     /* Toggle LED4 */
-    STM_EVAL_LEDToggle(LED6);
+    STM_EVAL_LEDToggle(LED5);
 //    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
 
-    // delay_ms(50);
-    ledd_flag = 1;
+    delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line2);
   }
@@ -208,10 +206,13 @@ void EXTI3_IRQHandler(void)
   {
     /* Toggle LED4 */
 
-    STM_EVAL_LEDToggle(LED3);
-    delay_ms(50);
+    STM_EVAL_LEDToggle(LED6);
+    delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line3);
+  }
+  else{
+	  STM_EVAL_LEDToggle(LED6);
   }
 }
 void EXTI4_IRQHandler(void)
@@ -220,18 +221,122 @@ void EXTI4_IRQHandler(void)
   {
     /* Toggle LED4 */
 
-    STM_EVAL_LEDToggle(LED5);
-    delay_ms(50);
+    STM_EVAL_LEDToggle(LED3);
+    delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line4);
   }
 }
 void EXTI9_5_IRQHandler(void){
+	 if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+	{
+	/* Toggle LED4 */
 
+		STM_EVAL_LEDToggle(LED4);
+		delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line5);
+	}
+
+	 else if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED5);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line6);
+	}
+	 if(EXTI_GetITStatus(EXTI_Line7) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED6);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line7);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line8) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED3);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line8);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line9) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line9);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line10) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line10);
+	}
 }
 
 void EXTI15_10_IRQHandler(void){
+	 if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+	{
+	/* Toggle LED4 */
 
+		STM_EVAL_LEDToggle(LED4);
+		delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line5);
+	}
+
+	 else if(EXTI_GetITStatus(EXTI_Line6) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED5);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line6);
+	}
+	 if(EXTI_GetITStatus(EXTI_Line7) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED6);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line7);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line8) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED3);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line8);
+	}
+
+	 if(EXTI_GetITStatus(EXTI_Line9) != RESET)
+	{
+	/* Toggle LED4 */
+
+	STM_EVAL_LEDToggle(LED4);
+	delay_ms(debounce_delay);
+	/* Clear the EXTI line 0 pending bit */
+	EXTI_ClearITPendingBit(EXTI_Line9);
+	}
 }
 
 /**
