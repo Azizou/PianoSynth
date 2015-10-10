@@ -1,5 +1,16 @@
 #include "main.h"
 
+
+void delay2(uint32_t microseconds) {
+  /* Hangs for specified number of microseconds. */
+  volatile uint32_t counter = 0;
+  microseconds *= 3;
+  for(; counter<microseconds; counter++) {
+    __asm("nop");
+    __asm("nop");
+  }
+}
+
 int main(void)
 {
 	uint32_t fTimer;
@@ -26,6 +37,7 @@ int main(void)
 	}
 	uint16_t result = 0;
 	m = 2*m-1;
+	//lcd diplasy
 	for (n = 0; n<DACBUFFERSIZE/2; n++)
 	{
 		result = (uint16_t)m*n;
@@ -52,7 +64,9 @@ int main(void)
 	DMA_Configuration ( TriangleWaveTable );
 
 	EXTILines_Config();
-	/* Infinite loop */
+
+	lcd_init();
+	lcd_two_line_write("PianoSyth is", "loading...");
 	while (1)
 	{
 	}
