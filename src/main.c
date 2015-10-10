@@ -7,7 +7,7 @@ int main(void)
 	uint16_t timerPeriod;
 	uint16_t n;
 	uint16_t m;
-	/* Calculate the gradient of the Sawtooth */
+
 	m = (uint16_t) ( 4096 / DACBUFFERSIZE);
 	STM_EVAL_LEDInit(LED4);
 	/* Create wave table for sinewave */
@@ -55,27 +55,25 @@ int main(void)
 	/* Infinite loop */
 	while (1)
 	{
-		if(STM_EVAL_PBGetState(BUTTON_USER)== SET){
-			buttonVal++;
-			buttonVal %= numWaves;
+		if(GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_14)== SET || GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_15)== SET || GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)== SET || GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_6)== SET){
+//			buttonVal++;
+//			buttonVal %= numWaves;
 			DMA_Cmd(DMA1_Stream5, DISABLE);	/* Disable the DMA */
-			if(buttonVal== 0){
+			if(GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_14)== SET){
 				DMA_Configuration ( SawtoothBuffer );
-				//flag = 1;
 			}
-			else if (buttonVal== 1)
+			else if (GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_15)== SET)
 			{
 				DMA_Configuration ( SineWaveBuffer );
 			}
-			else if (buttonVal== 2)
+			else if (GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)== SET)
 			{
 				DMA_Configuration ( PulseWaveTable);
 			}
-			else if (buttonVal== 3)
+			else if (GPIO_ReadInputDataBit(GPIOE,GPIO_Pin_6)== SET)
 			{
 				DMA_Configuration ( TriangleWaveTable);
 			}
-			while(STM_EVAL_PBGetState(BUTTON_USER)== SET);   //Do nothing while the button is still pressed
 			delay_ms(20); //debounce wait for 20ms
 		}
 		if(0){//STM_EVAL_PBGetState(BUTTON_USER)== SET){//pitch_flag){//zero by default
@@ -99,7 +97,7 @@ uint32_t UpdateTimerFrequency(){
 
 void RCC_Configuration(void){
 	/* Enable DMA and GPIOA Clocks */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1 | RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1 | RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC, ENABLE);
 	/* Enable DAC1 and TIM6 clocks */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC | RCC_APB1Periph_TIM6, ENABLE);
 
@@ -122,21 +120,24 @@ void GPIO_Configuration(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitTypeDef GPIO_InitStructure;
-	/* Pack the struct */
+
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_4;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	/* Call Init function */
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_15 | GPIO_Pin_13;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 \
-		  | GPIO_Pin_4 ;/*| GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 \
-		  | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 \
-		  | GPIO_Pin_14 | GPIO_Pin_15;*/
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
 }
 void DMA_Configuration(uint16_t* wavBuffer)
 {
