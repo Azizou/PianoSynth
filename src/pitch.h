@@ -11,7 +11,7 @@
 #include "stm32f4xx.h"
 
 uint16_t pitch_index = 70; //by default play A5 note 880Hz
-const float pitch_table[]=
+const float pitch_table[] =
 {
 	//     C          C#         D          D#         E          F          F#  	    G          G#         A          A#         B
 

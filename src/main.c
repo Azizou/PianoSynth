@@ -55,10 +55,11 @@ int main(void)
 	/* Infinite loop */
 	while (1)
 	{
-		if(STM_EVAL_PBGetState(BUTTON_USER)== SET){
+	}
+/**		if(STM_EVAL_PBGetState(BUTTON_USER)== SET){
 			buttonVal++;
 			buttonVal %= numWaves;
-			DMA_Cmd(DMA1_Stream5, DISABLE);	/* Disable the DMA */
+			DMA_Cmd(DMA1_Stream5, DISABLE);	// Disable the DMA
 			if(buttonVal== 0){
 				DMA_Configuration ( SawtoothBuffer );
 				//flag = 1;
@@ -88,6 +89,7 @@ int main(void)
 			Timer_Configuration( timerPeriod, TIMER6_PRESCALER );
 		}
 	}
+*/
 }
 
 uint16_t UpdateTimerPeriod(uint16_t tickRate,uint16_t freqTimer){

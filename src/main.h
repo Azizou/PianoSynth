@@ -13,6 +13,7 @@
 #include "stm32f4_discovery.h"
 #include <math.h>
 #include "pitch.h"
+#include "lcd.h"
 
 /* Private macro */
 #define DACBUFFERSIZE 		250
