@@ -194,7 +194,7 @@ void EXTI2_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED6);
-    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
+//    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
 
     // delay_ms(50);
     ledd_flag = 1;

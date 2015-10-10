@@ -15,8 +15,8 @@ int main(void)
   STM_EVAL_LEDInit(LED5);
   STM_EVAL_LEDInit(LED6);
   EXTI_Line_Config();
-  LED_Init(LED00);
-  LEDOn(LED00);
+//  LED_Init(LED00);
+  //LEDOn(LED00);
   // GPIO_SetBits(GPIOA, GPIO_Pin_3);//
   while (1);
 }
