@@ -22,7 +22,7 @@ int main(void)
   EXTI_Line_Config();
 
   lcd_init();
-  lcdLine1 = "Frequency1";
+  lcdLine1 = "Pianosythn";
 
   itoa(lcdLine2, 880, 10);
   lcd_two_line_write(lcdLine1, lcdLine2);
