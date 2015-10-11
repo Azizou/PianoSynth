@@ -17,25 +17,25 @@ int main(void)
   EXTI_Line_Config();
 
   lcd_init();
-  lcdLine1 = "Pianosythn!";
-
-  itoa(lcdLine2, 8800, 10);
-  lcd_two_line_write(lcdLine1, lcdLine2);
+//  lcdLine1 = "Pianosythn!";
+//
+//  itoa(lcdLine2, 8800, 10);
+//  lcd_two_line_write(lcdLine1, lcdLine2);
 
   uint8_t tog = 1;
 
   while (1)
   {
-    if (tog == 0)
-    {
-      itoa(lcdLine2, 880, 10);
-      lcd_two_line_write(lcdLine1, lcdLine2);
-    }
-    else
-    {
-      itoa(lcdLine2, 400, 10);
-      lcd_two_line_write(lcdLine1, lcdLine2);
-    }
+//    if (tog == 0)
+//    {
+////      itoa(lcdLine2, 880, 10);
+////      lcd_two_line_write(lcdLine1, lcdLine2);
+//      lcd_int_write("Kill your heros",880);
+//    }
+//    else
+//    {
+//      lcd_int_write("And you shall be heros: ",1000);
+//    }
 
     tog = (++tog)%2;
 

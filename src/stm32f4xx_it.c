@@ -22,10 +22,14 @@
   */ 
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_it.h"
+//#include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
+#include "lcd.h"
 
-int debounce_delay = 50;
+extern int pitch_index;
+//extern float pitch_table;
+extern const float pitch_table[];
+int debounce_delay = 1;
 
 void delay_ms(uint32_t milli)
 {
@@ -168,6 +172,8 @@ void EXTI0_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED3);
+    pitch_index = 7;
+    lcd_int_write("B0 note played", (int)pitch_table[pitch_index], "Hz");
      delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line0);
@@ -180,7 +186,9 @@ void EXTI1_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED4);
-     delay_ms(debounce_delay);
+    pitch_index = 8;
+    lcd_int_write("B1 note played", (int)pitch_table[pitch_index], "Hz");
+    delay_ms(debounce_delay);
 //  GPIO_SetBits(GPIOA, GPIO_Pin_3);
 
     /* Clear the EXTI line 0 pending bit */
@@ -193,6 +201,8 @@ void EXTI2_IRQHandler(void)
   {
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED5);
+    pitch_index = 9;
+    lcd_int_write("B2 note played", (int)pitch_table[pitch_index], "Hz");
 //    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
 
     delay_ms(debounce_delay);

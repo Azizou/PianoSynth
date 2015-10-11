@@ -20,5 +20,6 @@ void lcd_command (enum LcdCommand command);
 void lcd_string(uint8_t *string_to_print);
 void lcd_two_line_write(uint8_t* line1, uint8_t* line2);
 void itoa(uint8_t buf[], unsigned int d, int base);
+void itoa2(uint8_t buf[], unsigned int d, uint8_t unit[]);
 
 #endif

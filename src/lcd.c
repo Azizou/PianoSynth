@@ -39,7 +39,17 @@ void lcd_two_line_write(uint8_t* line1, uint8_t* line2) {
   lcd_command(LCD_GOTO_LINE_2);
   lcd_string(line2);
 }
+void lcd_int_write(uint8_t* message,int value, uint8_t unit[]){
+	uint8_t line2[16];
+	itoa2(line2,value,unit);
+	lcd_two_line_write(message,line2);
+}
 
+//void lcd_int_write(uint8_t* message,int value,uint8_t * unit){
+//	uint8_t line2[16];
+//	itoa(line2,value,10);
+//	lcd_two_line_write(message,line2);
+//}
 //============================================================================
 
 void lcd_init () {
@@ -163,6 +173,30 @@ void itoa(uint8_t buf[], unsigned int d, int base)
     buf[i++] = num + '0';
   }
   buf[i] = '\0';
+}
+
+void itoa2(uint8_t buf[], unsigned int d, uint8_t unit[])
+{
+  int div = 1;
+  int base = 10;
+  while (d/div >= base)
+    div *= base;
+
+  int i = 0;
+  while (div != 0)
+  {
+    int num = d/div;
+    d = d%div;
+    div /= base;
+    buf[i++] = num + '0';
+  }
+  //buf[i++] = ' ';
+  int j = 0;
+  for(;j<sizeof(unit); j++)
+  {
+	  buf[i+j] = unit[j];
+  }
+  buf[i+j] = '\0';
 }
 
 //============================================================================
