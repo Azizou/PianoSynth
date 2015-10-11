@@ -229,9 +229,12 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="ECSA_Prac1.com.atollic.truestudio.exe.569237724" name="Executable" projectType="com.atollic.truestudio.exe"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.atollic.truestudio.exe.debug.1256746562;com.atollic.truestudio.exe.debug.1256746562.;com.atollic.truestudio.exe.debug.toolchain.gcc.223052187;com.atollic.truestudio.gcc.input.1069008892">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.atollic.truestudio.mbs.ARMToolsPerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 </cproject>
