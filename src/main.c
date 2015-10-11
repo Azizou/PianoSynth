@@ -23,10 +23,20 @@ int main(void)
   STM_EVAL_LEDInit(LED5);
   STM_EVAL_LEDInit(LED6);
 
+  /* Initialize the keys and potentiometers */
   GPIO_Configuration();
+  /* Initialize the NVIC for the timer */
   NVIC_Configuration();
+  /* Initialize the timer */
   Timer_Configuration();
+  /* Initialize the DAC */
   DAC_Configuration();
+
+  /* Initialize the LCD screen */
+  lcd_init();
+  lcdLine1 = "PianoSynth!";
+  itoa(lcdLine2, 880, 10);
+  lcd_two_line_write(lcdLine1, lcdLine2);
 
   while (1);
 }

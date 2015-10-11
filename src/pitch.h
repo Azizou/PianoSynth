@@ -49,7 +49,7 @@ float getButtonFrequency(int buttonID);
 #define 	A0sharp 	29.14f
 #define 	B0			30.87f
 
-const float pitch_table[7][7][7]=		// Indexed by OCTAVE(button_index) * pitch_table[KEY][MODE][NOTE(button_index)]
+static float pitch_table[7][7][7]=		// Indexed by OCTAVE(button_index) * pitch_table[KEY][MODE][NOTE(button_index)]
 {
 					// Key of C
 	{{C0, D0, E0, F0, G0, A0, B0							},	// Ionian  		1st Mode
