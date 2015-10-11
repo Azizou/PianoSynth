@@ -7,13 +7,8 @@
 uint8_t led_flag = 0;
 uint8_t ledd_flag = 0;
 
-
-
 int main(void)
 {
-
-
-
   SystemInit();
   STM_EVAL_LEDInit(LED4);
   STM_EVAL_LEDInit(LED3);
@@ -22,9 +17,9 @@ int main(void)
   EXTI_Line_Config();
 
   lcd_init();
-  lcdLine1 = "Pianosythn";
+  lcdLine1 = "Pianosythn!";
 
-  itoa(lcdLine2, 880, 10);
+  itoa(lcdLine2, 8800, 10);
   lcd_two_line_write(lcdLine1, lcdLine2);
 
   uint8_t tog = 1;
@@ -35,7 +30,6 @@ int main(void)
     {
       itoa(lcdLine2, 880, 10);
       lcd_two_line_write(lcdLine1, lcdLine2);
-      //lcd_command(LCD_CLEAR_DISPLAY);
     }
     else
     {
