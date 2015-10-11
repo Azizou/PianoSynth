@@ -18,10 +18,24 @@ uint8_t ledd_flag = 0;
 int main(void)
 {
   SystemInit();
-  STM_EVAL_LEDInit(LED4);
-  STM_EVAL_LEDInit(LED3);
-  STM_EVAL_LEDInit(LED5);
-  STM_EVAL_LEDInit(LED6);
+
+  /* Initialize the onboard LEDs */
+  //STM_EVAL_LEDInit(LED4);
+  //STM_EVAL_LEDInit(LED3);
+  //STM_EVAL_LEDInit(LED5);
+  //STM_EVAL_LEDInit(LED6);
+
+  /* Initialize the offboard LEDs */
+  /*LED_Init(LED00);
+  LED_Init(LED01);
+  LED_Init(LED02);
+  LED_Init(LED03);
+  LED_Init(LED04);
+  LED_Init(LED05);
+  LED_Init(LED06);
+  LED_Init(LED07);
+  LED_Init(LED08);
+  LED_Init(LED09);*/
 
   /* Initialize the keys and potentiometers */
   GPIO_Configuration();
@@ -52,6 +66,13 @@ void TIM3_IRQHandler(void)
   {
     /* Clear interrupt pending bit */
     TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+
+    /*** TESTING CODE ***/
+    if(sampleCounter % 100000 == 0){
+      //itoa(lcdLine2, (uint8_t)(sampleCounter / 100000), 10);
+      //lcd_two_line_write(lcdLine1, lcdLine2);
+    }
+    /*** END TESTING CODE ***/
 
     /* Check which keys are pressed and build sample */
     currentSample = 0;

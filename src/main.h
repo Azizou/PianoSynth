@@ -26,7 +26,7 @@
 #define TIMER_FREQUENCY 100000
 
 uint8_t *lcdLine1;	/* The first line to be displayed on the LCD */
-uint8_t *lcdLine2;	/* The second line to be displayed on the LCD */
+uint8_t lcdLine2[16];	/* The second line to be displayed on the LCD */
 
 // void UART_Configuration(void);
 // void DAC_Configuration(void);
