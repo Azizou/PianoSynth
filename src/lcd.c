@@ -45,6 +45,12 @@ void lcd_int_write(uint8_t* message,int value, uint8_t unit[]){
 	lcd_two_line_write(message,line2);
 }
 
+void lcd_float_write(uint8_t* message,float value, uint8_t unit[]){
+	uint8_t line2[16];
+	ftoa(line2,value,unit);
+	lcd_two_line_write(message,line2);
+}
+
 //void lcd_int_write(uint8_t* message,int value,uint8_t * unit){
 //	uint8_t line2[16];
 //	itoa(line2,value,10);
@@ -191,6 +197,43 @@ void itoa2(uint8_t buf[], unsigned int d, uint8_t unit[])
     buf[i++] = num + '0';
   }
   //buf[i++] = ' ';
+  int j = 0;
+  for(;j<sizeof(unit); j++)
+  {
+	  buf[i+j] = unit[j];
+  }
+  buf[i+j] = '\0';
+}
+
+void ftoa(uint8_t buf[], float f, uint8_t unit[])
+{
+  int div = 1;
+  int base = 10;
+  int d = (int)f;
+  while (d/div >= base)
+    div *= base;
+
+  int i = 0;
+  while (div != 0)
+  {
+    int num = d/div;
+    d = d%div;
+    div /= base;
+    buf[i++] = num + '0';
+  }
+  buf[i++] = '.';
+
+  // decimal part.
+  float d2 = f - (int)f;
+  while(1)
+  {
+	  d2 *= base;
+	  int num = (int)d2;
+	  buf[i++] = num + '0';
+	  if (num == (int)d2) {break;}
+	  d2 -= num;
+  }
+
   int j = 0;
   for(;j<sizeof(unit); j++)
   {

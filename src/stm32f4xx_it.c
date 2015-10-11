@@ -173,7 +173,7 @@ void EXTI0_IRQHandler(void)
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED3);
     pitch_index = 7;
-    lcd_int_write("B0 note played", (int)pitch_table[pitch_index], "Hz");
+    lcd_float_write("B0 note played", pitch_table[pitch_index], "Hz");
      delay_ms(debounce_delay);
     /* Clear the EXTI line 0 pending bit */
     EXTI_ClearITPendingBit(EXTI_Line0);
@@ -187,7 +187,7 @@ void EXTI1_IRQHandler(void)
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED4);
     pitch_index = 8;
-    lcd_int_write("B1 note played", (int)pitch_table[pitch_index], "Hz");
+    lcd_float_write("B1 note played", pitch_table[pitch_index], "Hz");
     delay_ms(debounce_delay);
 //  GPIO_SetBits(GPIOA, GPIO_Pin_3);
 
@@ -202,7 +202,7 @@ void EXTI2_IRQHandler(void)
     /* Toggle LED4 */
     STM_EVAL_LEDToggle(LED5);
     pitch_index = 9;
-    lcd_int_write("B2 note played", (int)pitch_table[pitch_index], "Hz");
+    lcd_float_write("B2 note played", pitch_table[pitch_index], "Hz");
 //    GPIO_ResetBits(GPIOA, GPIO_Pin_3);
 
     delay_ms(debounce_delay);
