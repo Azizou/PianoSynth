@@ -7,8 +7,6 @@
 
 #ifndef PITCH_H_
 #define PITCH_H_
-//#include "main.h"
-
 
 float getButtonFrequency(int buttonID);
 
