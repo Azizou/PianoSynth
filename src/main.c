@@ -14,6 +14,13 @@ uint32_t currentSample = 0;
 uint8_t led_flag = 0;
 uint8_t ledd_flag = 0;
 
+/*****TESTING CODE ****/
+#define SINE_WAVE   0
+#define PULSE_WAVE    1
+#define TRIANGULAR_WAVE 2
+#define SAWTOOTHWAVE  3
+/***** END TESTING ****/
+
 /******* PROGRAM ENTRY POINT *********/
 int main(void)
 {
