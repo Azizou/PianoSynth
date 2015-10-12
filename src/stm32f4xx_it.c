@@ -25,12 +25,14 @@
 //#include "stm32f4xx_it.h"
 #include "stm32f4_discovery.h"
 #include "lcd.h"
+#include "pitch.h"
+#include "main.h"
 
-extern int pitch_index;
+//extern int pitch_index;
 //extern float pitch_table;
-extern const float pitch_table[];
+//extern  float pitch_table[7][7][7];
 int debounce_delay = 1;
-
+//extern int button_index;
 void delay_ms(uint32_t milli)
 {
   uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
@@ -166,62 +168,65 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
-void default_exti_handler(uint32_t line, char * message, uint8_t key){
+
+//void setMode(int buttonId){
+//	mode += buttonId/7;
+//}
+void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
   if(EXTI_GetITStatus(line) != RESET)
   {
-	/* Toggle LED4 */
-	STM_EVAL_LEDToggle(LED3);
-	pitch_index = key;
-	lcd_float_write(message, pitch_table[key], "Hz");
-	 delay_ms(debounce_delay);
-	/* Clear the EXTI line 0 pending bit */
+	 button_index = buttonID;
+	lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
+	UpdateTimerPeriod(getButtonFrequency(buttonID));
+	Timer_Configuration();
+	delay_ms(debounce_delay);
 	EXTI_ClearITPendingBit(line);
+  }
+  else{
+	  lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
+	  delay_ms(debounce_delay);
+	  EXTI_ClearITPendingBit(line);
+	  TIM_Cmd(TIM6, DISABLE);
+
   }
 }
 
 
 void EXTI0_IRQHandler(void)
 {
-	default_exti_handler(EXTI_Line0,"Note frequency:",70);
+	default_exti_handler(EXTI_Line0,"Note frequency:",0);
 }
 
 void EXTI1_IRQHandler(void)
 {
-	default_exti_handler(EXTI_Line1,"Note frequency:",50);
+	default_exti_handler(EXTI_Line1,"Note frequency:",1);
 }
 void EXTI2_IRQHandler(void)
 {
-	default_exti_handler(EXTI_Line2,"Note frequency:",60);
+	default_exti_handler(EXTI_Line2,"Note frequency:",2);
 }
 void EXTI3_IRQHandler(void)
 {
-	default_exti_handler(EXTI_Line3,"Note frequency:",40);
+	default_exti_handler(EXTI_Line3,"Note frequency:",3);
 }
 void EXTI4_IRQHandler(void)
 {
-	default_exti_handler(EXTI_Line4,"Note frequency:",80);
+	default_exti_handler(EXTI_Line4,"Note frequency:",4);
 }
 void EXTI9_5_IRQHandler(void){
 	default_exti_handler(EXTI_Line5,"Note frequency:",5);
-	default_exti_handler(EXTI_Line6,"Note frequency:",10);
-	default_exti_handler(EXTI_Line7,"Note frequency:",15);
-	default_exti_handler(EXTI_Line8,"Note frequency:",25);
-	default_exti_handler(EXTI_Line9,"Note frequency:",35);
+	default_exti_handler(EXTI_Line6,"Note frequency:",6);
+	default_exti_handler(EXTI_Line7,"Note frequency:",7);
+	default_exti_handler(EXTI_Line8,"Note frequency:",8);
+	default_exti_handler(EXTI_Line9,"Note frequency:",9);
 }
 
 void EXTI15_10_IRQHandler(void){
-	default_exti_handler(EXTI_Line10,"Note frequency:",2);
-	default_exti_handler(EXTI_Line11,"Note frequency:",86);
-	default_exti_handler(EXTI_Line12,"Note frequency:",66);
-	default_exti_handler(EXTI_Line13,"Note frequency:",55);
+	default_exti_handler(EXTI_Line10,"Note frequency:",10);
+	default_exti_handler(EXTI_Line11,"Note frequency:",11);
+	default_exti_handler(EXTI_Line12,"Note frequency:",12);
+	default_exti_handler(EXTI_Line13,"Note frequency:",13);
 }
 
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-  */ 
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
