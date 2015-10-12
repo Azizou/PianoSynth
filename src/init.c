@@ -32,16 +32,16 @@ void GPIO_Configuration(void)
 	GPIO_Init(SPEAKER_PORT, &GPIO_InitStruct);
 	//toggle switch 0
 	GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH0;
-	GPIO_Init(TOGGLE_PORT0, &GPIO_InitStruct);
+	GPIO_Init(CUSTOMTOGGLE_PORT0, &GPIO_InitStruct);
 	//toggle switch 1
 	GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH1;
-	GPIO_Init(TOGGLE_PORT1, &GPIO_InitStruct);
+	GPIO_Init(CUSTOMTOGGLE_PORT1, &GPIO_InitStruct);
 	//toggle switch 2
 	GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH2;
-	GPIO_Init(TOGGLE_PORT2, &GPIO_InitStruct);
+	GPIO_Init(CUSTOMTOGGLE_PORT2, &GPIO_InitStruct);
 	//toggle switch 3
 	GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH3;
-	GPIO_Init(TOGGLE_PORT3, &GPIO_InitStruct);
+	GPIO_Init(CUSTOMTOGGLE_PORT3, &GPIO_InitStruct);
 }
 void DMA_Configuration(uint16_t* wavBuffer)
 {

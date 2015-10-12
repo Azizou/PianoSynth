@@ -26,12 +26,13 @@
 #include "stm32f4_discovery.h"
 #include "lcd.h"
 #include "pitch.h"
+#include "main.h"
 
-extern int pitch_index;
+//extern int pitch_index;
 //extern float pitch_table;
 //extern  float pitch_table[7][7][7];
 int debounce_delay = 1;
-extern int button_index;
+//extern int button_index;
 void delay_ms(uint32_t milli)
 {
   uint32_t delay = milli * 17612;              // approximate loops per ms at 168 MHz, Debug config
@@ -174,12 +175,19 @@ void SysTick_Handler(void)
 void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
   if(EXTI_GetITStatus(line) != RESET)
   {
-	/* Toggle LED4 */
-	  button_index = buttonID;
-//	STM_EVAL_LEDToggle(LED3);
+	 button_index = buttonID;
 	lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
+	UpdateTimerPeriod();
+	Timer_Configuration();
 	delay_ms(debounce_delay);
 	EXTI_ClearITPendingBit(line);
+  }
+  else{
+	  lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
+	  delay_ms(debounce_delay);
+	  EXTI_ClearITPendingBit(line);
+	  TIM_Cmd(TIM6, DISABLE);
+
   }
 }
 

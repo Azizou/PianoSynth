@@ -11,21 +11,22 @@
 
 int main(void)
 {
+
   EXTI_Line_Config();
 
   lcd_init();
   lcd_two_line_write((uint8_t *)"PianoSynth is",(uint8_t *)"ready to shine");
-	uint16_t n;
-	uint16_t m;
-	m = (uint16_t) ( 4096 / DACBUFFERSIZE);
-	for (n = 0; n<DACBUFFERSIZE; n++)
-	{
-		SineWaveBuffer[n] = (uint16_t)((0xfff)/2.0)*( sin( M_TWOPI*n/DACBUFFERSIZE) + 1.0 );
-	}
-	for (n = 0; n<DACBUFFERSIZE; n++)
-	{
-		SawtoothBuffer[n] = (uint16_t)(m*n);
-	}
+  uint16_t n;
+  uint16_t m;
+  m = (uint16_t) ( 4096 / DACBUFFERSIZE);
+  for (n = 0; n<DACBUFFERSIZE; n++)
+  {
+	  SineWaveBuffer[n] = (uint16_t)((0xfff)/2.0)*( sin( M_TWOPI*n/DACBUFFERSIZE) + 1.0 );
+  }
+  for (n = 0; n<DACBUFFERSIZE; n++)
+  {
+	  SawtoothBuffer[n] = (uint16_t)(m*n);
+  }
 	for (n = 0; n<DACBUFFERSIZE/2; n++)
 	{
 		PulseWaveTable[n] = 4095;
@@ -53,19 +54,19 @@ int main(void)
 
 	while (1)
 	{
-	  if(GPIO_ReadInputDataBit(TOGGLE_PORT0, TOGGLE_SWITCH0)){//set wave to sinewave
+	  if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT0, TOGGLE_SWITCH0)){//set wave to sinewave
 		  waveform = SINE_WAVE;
 		  setWave(waveform);
 	  }
-	  else if(GPIO_ReadInputDataBit(TOGGLE_PORT1, TOGGLE_SWITCH1)){//set wave to sinewave
+	  else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT1, TOGGLE_SWITCH1)){//set wave to sinewave
 		  waveform = TRIANGULAR_WAVE;
 		  setWave(waveform);
 	  }
-	  else if(GPIO_ReadInputDataBit(TOGGLE_PORT2, TOGGLE_SWITCH2)){//set wave to sinewave
+	  else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT2, TOGGLE_SWITCH2)){//set wave to sinewave
 		  waveform = PULSE_WAVE;
 		  setWave(waveform);
 	  }
-	  else if(GPIO_ReadInputDataBit(TOGGLE_PORT3, TOGGLE_SWITCH3)){//set wave to sinewave
+	  else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT3, TOGGLE_SWITCH3)){//set wave to sinewave
 		  waveform = SAWTOOTHWAVE;
 		  setWave(waveform);
 	  }
@@ -73,7 +74,7 @@ int main(void)
 		  waveform = SINE_WAVE;
 		  setWave(waveform);
 	  }
-  }
+	}
 }
 
 void setWave(int waveform){
