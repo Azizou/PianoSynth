@@ -35,3 +35,5 @@
 *.elf
 *.launch
 *.map
+.settings/
+.cproject
