@@ -37,24 +37,79 @@ int main(void)
   LED_Init(LED08);
   LED_Init(LED09);*/
 
+  
+
+  /*** TESTING CODE ***/
+
+  uint16_t n;
+  uint16_t m;
+  m = (uint16_t) ( 4096 / DACBUFFERSIZE);
+  for (n = 0; n<DACBUFFERSIZE; n++)
+  {
+    SineWaveBuffer[n] = (uint16_t)((0xfff)/2.0)*( sin( M_TWOPI*n/DACBUFFERSIZE) + 1.0 );
+  }
+  for (n = 0; n<DACBUFFERSIZE; n++)
+  {
+    SawtoothBuffer[n] = (uint16_t)(m*n);
+  }
+  for (n = 0; n<DACBUFFERSIZE/2; n++)
+  {
+    PulseWaveTable[n] = 4095;
+    PulseWaveTable[DACBUFFERSIZE - n] = 0;
+  }
+  uint16_t result = 0;
+  m = 2*m-1;
+  for (n = 0; n<DACBUFFERSIZE/2; n++)
+  {
+    result = (uint16_t)m*n;
+    TriangleWaveTable[n] = result;
+    TriangleWaveTable[DACBUFFERSIZE - n-1] = result;
+  }
+  UpdateTimerPeriod();
+  //    timerFreq = TIMER_CLOCK / TIMER6_PRESCALER; /* Timer tick is in Hz */
+  //timerPeriod = (uint16_t)( TIMERFREQ / fTimer );
+  uint16_t  waveform = 0;
+
+  while (1)
+  {
+    if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT0, TOGGLE_SWITCH0)){//set wave to sinewave
+      waveform = SINE_WAVE;
+      setWave(waveform);
+    }
+    else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT1, TOGGLE_SWITCH1)){//set wave to sinewave
+      waveform = TRIANGULAR_WAVE;
+      setWave(waveform);
+    }
+    else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT2, TOGGLE_SWITCH2)){//set wave to sinewave
+      waveform = PULSE_WAVE;
+      setWave(waveform);
+    }
+    else if(GPIO_ReadInputDataBit(CUSTOMTOGGLE_PORT3, TOGGLE_SWITCH3)){//set wave to sinewave
+      waveform = SAWTOOTHWAVE;
+      setWave(waveform);
+    }
+    else{
+      waveform = SINE_WAVE;
+      setWave(waveform);
+    }
+  }
+  /**** END TESTING CODE ****/
+
   /* Initialize the keys and potentiometers */
   GPIO_Configuration();
   /* Initialize the NVIC for the timer */
   NVIC_Configuration();
   /* Initialize the timer */
   Timer_Configuration();
-  /* Initialize the DMA */
-  DMA_Configuration();
   /* Initialize the DAC */
   DAC_Configuration();
+  /* Initialize the DMA */
+  DMA_Configuration(SineWaveBuffer);
 
   /* Initialize the LCD screen */
   lcd_init();
-  lcdLine1 = "PianoSynth!";
-  itoa(lcdLine2, 880, 10);
-  lcd_two_line_write(lcdLine1, lcdLine2);
+  lcd_two_line_write((uint8_t *)"PianoSynth is",(uint8_t *)"ready to shine");
 
-  while (1);
 }
 
 /**
@@ -104,6 +159,26 @@ void TIM3_IRQHandler(void)
     DAC_SetChannel2Data(DAC_Align_12b_R, currentSample);
   }
 
+}
+
+void setWave(int waveform){
+   DMA_Cmd(DMA1_Stream5, DISABLE);
+  switch(waveform){
+    case SINE_WAVE :
+      DMA_Configuration(SineWaveBuffer);
+      break;
+    case PULSE_WAVE :
+      DMA_Configuration(PulseWaveTable);
+      break;
+    case TRIANGULAR_WAVE:
+      DMA_Configuration(TriangleWaveTable);
+      break;
+    case SAWTOOTHWAVE:
+       DMA_Configuration(SawtoothBuffer);
+       break;
+    default:
+      DMA_Configuration(SineWaveBuffer);
+  }
 }
 
 #ifdef  USE_FULL_ASSERT

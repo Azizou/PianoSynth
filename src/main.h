@@ -23,6 +23,26 @@
 // #define TIMER6_PRESCALER	2 	/* produces a 42MHz tick */
 // #define TIMER_CLOCK			84E6  TIM6 runs at 84MHz 
 
+/*** CODE FOR TIMER 6 ****/
+#define DACBUFFERSIZE 		250
+#define TIMER6_PRESCALER	2 	/* produces a 42MHz tick */
+#define TIMER_CLOCK			84E6 /* TIM6 runs at 84MHz */
+#define TIMERFREQ			42E6
+
+ int button_index;
+int note_index;
+int key_index;
+
+uint16_t timerFreq;
+uint16_t timerPeriod;
+
+uint16_t SineWaveBuffer[DACBUFFERSIZE]; 	/* Array for  waveform 1*/
+uint16_t SawtoothBuffer[DACBUFFERSIZE]; 	/* Array for  waveform 2*/
+uint16_t PulseWaveTable[DACBUFFERSIZE];
+uint16_t TriangleWaveTable[DACBUFFERSIZE];
+
+ /******************/
+
 #define TIMER_FREQUENCY 100000
 
 uint8_t *lcdLine1;	/* The first line to be displayed on the LCD */

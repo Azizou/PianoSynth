@@ -10,7 +10,7 @@ void GPIO_Configuration(void)
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1 | RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | 
   						RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE, ENABLE);
   /* Enable TIM3 clock */
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 | RCC_APB1Periph_TIM6, ENABLE);
   /* Enable DAC clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
   /* Enable SYSCFG clock */
@@ -98,7 +98,6 @@ void NVIC_Configuration(void)
   */
 void Timer_Configuration(void){
   TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
-  TIM_OCInitTypeDef TIM_OCInitStruct;
 
   TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
 
@@ -114,6 +113,22 @@ void Timer_Configuration(void){
 
   /* TIM3 enable counter */
   TIM_Cmd(TIM3, ENABLE);
+
+
+
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStruct;
+  /* pack Timer struct */
+  TIM_TimeBaseStruct.TIM_Period = timerPeriod-1;
+  TIM_TimeBaseStruct.TIM_Prescaler = TIMER6_PRESCALER-1;
+  TIM_TimeBaseStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+  TIM_TimeBaseStruct.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseStruct.TIM_RepetitionCounter = 0x0000;
+  /* Call init function */
+  TIM_TimeBaseInit(TIM6, &TIM_TimeBaseStruct);
+  /* Select Timer to trigger DAC */
+  TIM_SelectOutputTrigger(TIM6, TIM_TRGOSource_Update);
+  /* TIM6 enable counter */
+  TIM_Cmd(TIM6, ENABLE);
 }
 
 // /**
