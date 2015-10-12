@@ -173,18 +173,18 @@ void SysTick_Handler(void)
 //	mode += buttonId/7;
 //}
 void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
-  if(GPIO_ReadInputDataBit(BUTTON_PORT[buttonID], BUTTON_PIN[buttonID]) == 0)
+  if(EXTI_GetITStatus(line) != RESET)
   {
 	 button_index = buttonID;
-	 lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
-	 UpdateTimerPeriod();
-	 Timer_Configuration();
-	 //delay_ms(debounce_delay);
-	 EXTI_ClearITPendingBit(line);
+	lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
+	UpdateTimerPeriod();
+	Timer_Configuration();
+	delay_ms(debounce_delay);
+	EXTI_ClearITPendingBit(line);
   }
   else{
 	  lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
-	  //delay_ms(debounce_delay);
+	  delay_ms(debounce_delay);
 	  EXTI_ClearITPendingBit(line);
 	  TIM_Cmd(TIM6, DISABLE);
 
