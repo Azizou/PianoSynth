@@ -4,11 +4,11 @@
 
 void GPIO_Configuration(void)
 {
-  GPIO_InitTypeDef   GPIO_InitStructure;
-  NVIC_InitTypeDef   NVIC_InitStructure;
-  EXTI_InitTypeDef   EXTI_InitStructure;
-  /* Enable GPIOE, GPIOD clock */
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD | , ENABLE);
+  GPIO_InitTypeDef   GPIO_InitStructure, GPIO_InitStruct;
+
+  /* Enable GPIO clocks */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1 | RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | 
+  						RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE, ENABLE);
   /* Enable TIM3 clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
   /* Enable DAC clock */
@@ -51,6 +51,27 @@ void GPIO_Configuration(void)
   GPIO_InitStructure.GPIO_Pin = BUTTON13_PIN;
   GPIO_Init(BUTTON13_PORT, &GPIO_InitStructure);
 
+  /* Enable Toggle Switches */
+  GPIO_InitStruct.GPIO_Pin = SPEAKER_PIN;
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+  GPIO_Init(SPEAKER_PORT, &GPIO_InitStruct);
+  //toggle switch 0
+  GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH0;
+  GPIO_Init(CUSTOMTOGGLE_PORT0, &GPIO_InitStruct);
+  //toggle switch 1
+  GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH1;
+  GPIO_Init(CUSTOMTOGGLE_PORT1, &GPIO_InitStruct);
+  //toggle switch 2
+  GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH2;
+  GPIO_Init(CUSTOMTOGGLE_PORT2, &GPIO_InitStruct);
+  //toggle switch 3
+  GPIO_InitStruct.GPIO_Pin = TOGGLE_SWITCH3;
+  GPIO_Init(CUSTOMTOGGLE_PORT3, &GPIO_InitStruct);
+
 }
 
 /**
@@ -81,8 +102,8 @@ void Timer_Configuration(void){
 
   TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
 
-  TIM_TimeBaseInitStruct.TIM_Period = 10-1; //TIM3 has a frequency of 10000Hz
-  TIM_TimeBaseInitStruct.TIM_Prescaler = 840-1;
+  TIM_TimeBaseInitStruct.TIM_Period = 840; //TIM3 has a frequency of 100000Hz
+  TIM_TimeBaseInitStruct.TIM_Prescaler = 0;
   TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;
   TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
 
@@ -95,32 +116,71 @@ void Timer_Configuration(void){
   TIM_Cmd(TIM3, ENABLE);
 }
 
-/**
- * Set up the DAC in Trigger_None mode
- */
+// /**
+//  * Set up the DAC in Trigger_None mode
+//  */
 
-void DAC_Configuration(void){
-  GPIO_InitTypeDef GPIO_InitStruct;
-  DAC_InitTypeDef DAC_InitStructure;
+// void DAC_Configuration(void){
+//   GPIO_InitTypeDef GPIO_InitStruct;
+//   DAC_InitTypeDef DAC_InitStructure;
 
-  /* GPIO CONFIGURATION of DAC speaker Pin */
+//   /* GPIO CONFIGURATION of DAC speaker Pin */
 
-  GPIO_InitStruct.GPIO_Pin = SPEAKER_PIN;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_Init(SPEAKER_PORT, &GPIO_InitStruct);
+//   GPIO_InitStruct.GPIO_Pin = SPEAKER_PIN;
+//   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AN;
+//   GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+//   GPIO_Init(SPEAKER_PORT, &GPIO_InitStruct);
 
-  /* DAC channel 2 Configuration */ 
-  DAC_InitStructure.DAC_Trigger = DAC_Trigger_None; 
-  DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None; 
-  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable; 
-  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
+//   /* DAC channel 2 Configuration */ 
+//   DAC_InitStructure.DAC_Trigger = DAC_Trigger_None; 
+//   DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None; 
+//   DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable; 
+//   DAC_Init(DAC_Channel_2, &DAC_InitStructure);
 
-  /* Enable DAC Channel2 */ 
-  DAC_Cmd(DAC_Channel_2, ENABLE);
+//   /* Enable DAC Channel2 */ 
+//   DAC_Cmd(DAC_Channel_2, ENABLE);
 
-  // TODO: TRY SOFTWARE TRIGGER IF THIS GIVES PROBLEMS
-  // DAC_InitStructure.DAC_Trigger = DAC_Trigger_Software;
-  // Then, fire trigger using:
-  // DAC_SoftwareTriggerCmd(DAC_Channel_2, ENABLE);
+//   // TODO: TRY SOFTWARE TRIGGER IF THIS GIVES PROBLEMS
+//   // DAC_InitStructure.DAC_Trigger = DAC_Trigger_Software;
+//   // Then, fire trigger using:
+//   // DAC_SoftwareTriggerCmd(DAC_Channel_2, ENABLE);
+// }
+
+void DMA_Configuration(uint16_t* wavBuffer)
+{
+	DMA_InitTypeDef DMA_InitStructure;
+	//Initialize the structure to default values
+	DMA_StructInit(&DMA_InitStructure);
+	DMA_InitStructure.DMA_Channel = DMA_Channel_7;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(DAC_BASE + 0x08);  //DAC channel1 12-bit right-aligned data holding register (ref manual pg. 264)
+	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)wavBuffer;
+	DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+	DMA_InitStructure.DMA_BufferSize = DACBUFFERSIZE;
+	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
+	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
+	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+	/* Call Init function */
+	DMA_Init(DMA1_Stream5, &DMA_InitStructure);
+	/* Enable DMA */
+	DMA_Cmd(DMA1_Stream5, ENABLE);
+}
+
+void DAC_Configuration(void)
+{
+	DAC_InitTypeDef DAC_InitStruct;
+	DAC_InitStruct.DAC_Trigger = DAC_Trigger_T6_TRGO;
+	DAC_InitStruct.DAC_WaveGeneration = DAC_WaveGeneration_None;
+	DAC_InitStruct.DAC_LFSRUnmask_TriangleAmplitude = DAC_LFSRUnmask_Bit0;
+	DAC_InitStruct.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
+	DAC_Init(DAC_Channel_1, &DAC_InitStruct);
+	DAC_DMACmd(DAC_Channel_1, ENABLE);
+	/* Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is automatically connected to the DAC converter. */
+	DAC_Cmd(DAC_Channel_1, ENABLE);
 }

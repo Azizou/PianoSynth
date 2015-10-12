@@ -43,6 +43,8 @@ int main(void)
   NVIC_Configuration();
   /* Initialize the timer */
   Timer_Configuration();
+  /* Initialize the DMA */
+  DMA_Configuration();
   /* Initialize the DAC */
   DAC_Configuration();
 
@@ -78,7 +80,7 @@ void TIM3_IRQHandler(void)
     currentSample = 0;
     numButtonsPressed = 0;  // For averaging the sample
 
-    if(GPIO_ReadInputDataBit(BUTTON0_PORT, BUTTON0_PIN)){
+    if(GPIO_ReadInputDataBit(BUTTON_PORT[0], BUTTON_PIN[0])){
     //    LEDOn(...);
     //    TODO: Add the sample for this frequency component
     //          -- Test the formula for an 880Hz sinusoid then repeat
