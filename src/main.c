@@ -154,7 +154,8 @@ void TIM3_IRQHandler(void)
         //   (sin(sampleCounter* 2 *3.1415 
         //                     * getButtonFrequency(i) / TIMER_FREQUENCY) + 1));
         // numButtonsPressed++;
-        lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
+        itoa(lcdLine2, getButtonFrequency(i), 10);
+        lcd_two_line_write((uint8_t *)"Frequency: ", lcdLine2);
         TIM_Cmd(TIM6, ENABLE);  // TESTING
         buttonPressed = 1;
       }
