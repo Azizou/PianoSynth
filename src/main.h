@@ -41,6 +41,9 @@ uint16_t SawtoothBuffer[DACBUFFERSIZE]; 	/* Array for  waveform 2*/
 uint16_t PulseWaveTable[DACBUFFERSIZE];
 uint16_t TriangleWaveTable[DACBUFFERSIZE];
 
+void UpdateTimerPeriod();
+void setWave(int waveform);
+
  /******************/
 
 #define TIMER_FREQUENCY 100000

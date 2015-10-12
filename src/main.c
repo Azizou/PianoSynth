@@ -141,20 +141,29 @@ void TIM3_IRQHandler(void)
     /* Check which keys are pressed and build sample */
     currentSample = 0;
     numButtonsPressed = 0;  // For averaging the sample
+    int buttonPressed = 0;
+    int i;
 
-    if(GPIO_ReadInputDataBit(BUTTON_PORT[0], BUTTON_PIN[0])){
-    //    LEDOn(...);
-    //    TODO: Add the sample for this frequency component
-    //          -- Test the formula for an 880Hz sinusoid then repeat
-    //          -- May be missing a factor of 2pi, but probably not
-      currentSample += (uint16_t)(((0xFFF+1)/2) *
-        (sin(sampleCounter* 2 *3.1415 
-                          * getButtonFrequency(0) / TIMER_FREQUENCY) + 1));
-      numButtonsPressed++;
+    for(i = 0; i < 14; ++i){
+      if(GPIO_ReadInputDataBit(BUTTON_PORT[i], BUTTON_PIN[i])){
+      //    LEDOn(...);
+      //    TODO: Add the sample for this frequency component
+      //          -- Test the formula for an 880Hz sinusoid then repeat
+      //          -- May be missing a factor of 2pi, but probably not
+        // currentSample += (uint16_t)(((0xFFF+1)/2) *
+        //   (sin(sampleCounter* 2 *3.1415 
+        //                     * getButtonFrequency(i) / TIMER_FREQUENCY) + 1));
+        // numButtonsPressed++;
+        lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
+        TIM_Cmd(TIM6, ENABLE);  // TESTING
+        buttonPressed = 1;
+      }
+      //else LEDOff(...);
     }
-    //else LEDOff(...);
-
-    // TODO: Repeat the above for every key
+    if(!buttonPressed){
+      lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
+      TIM_Cmd(TIM6, DISABLE);
+    }
 
     sampleCounter++;
     
@@ -186,6 +195,10 @@ void setWave(int waveform){
     default:
       DMA_Configuration(SineWaveBuffer);
   }
+}
+
+void UpdateTimerPeriod(){
+  timerPeriod =  (uint16_t)( TIMERFREQ /(uint32_t)getButtonFrequency(button_index)*DACBUFFERSIZE);
 }
 
 #ifdef  USE_FULL_ASSERT

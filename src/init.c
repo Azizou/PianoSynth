@@ -128,7 +128,7 @@ void Timer_Configuration(void){
   /* Select Timer to trigger DAC */
   TIM_SelectOutputTrigger(TIM6, TIM_TRGOSource_Update);
   /* TIM6 enable counter */
-  TIM_Cmd(TIM6, ENABLE);
+  TIM_Cmd(TIM6, DISABLE);
 }
 
 // /**
