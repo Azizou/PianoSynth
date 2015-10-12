@@ -173,7 +173,7 @@ void SysTick_Handler(void)
 //	mode += buttonId/7;
 //}
 void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
-  if(EXTI_GetITStatus(line) != SET)
+  if(EXTI_GetITStatus(line) != RESET)
   {
 	 button_index = buttonID;
 	 pressed = 1;
@@ -182,6 +182,9 @@ void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
 	Timer_Configuration();
 	delay_ms(debounce_delay);
 	EXTI_ClearITPendingBit(line);
+	 DMA_Cmd(DMA1_Stream5, DISABLE);
+	  DMA_Configuration(SineWaveBuffer);
+
   }
   else{
 	  pressed = 0;
