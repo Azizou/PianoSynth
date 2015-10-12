@@ -23,6 +23,7 @@ int button_index;
 int note_index;
 int key_index;
 
+static int pressed = 0;
 uint16_t timerFreq;
 uint16_t timerPeriod;
 

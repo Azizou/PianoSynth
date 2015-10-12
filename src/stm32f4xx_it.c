@@ -173,9 +173,10 @@ void SysTick_Handler(void)
 //	mode += buttonId/7;
 //}
 void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
-  if(EXTI_GetITStatus(line) != RESET)
+  if(EXTI_GetITStatus(line) != SET)
   {
 	 button_index = buttonID;
+	 pressed = 1;
 	lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
 	UpdateTimerPeriod();
 	Timer_Configuration();
@@ -183,12 +184,17 @@ void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
 	EXTI_ClearITPendingBit(line);
   }
   else{
-	  lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
-	  delay_ms(debounce_delay);
+	  pressed = 0;
 	  EXTI_ClearITPendingBit(line);
-	  TIM_Cmd(TIM6, DISABLE);
 
   }
+//  else{
+//	  lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
+//	  delay_ms(debounce_delay);
+//	  EXTI_ClearITPendingBit(line);
+//	  TIM_Cmd(TIM6, DISABLE);
+//
+//  }
 }
 
 

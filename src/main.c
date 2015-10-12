@@ -15,7 +15,7 @@ int main(void)
   EXTI_Line_Config();
 
   lcd_init();
-  lcd_two_line_write((uint8_t *)"PianoSynth is",(uint8_t *)"ready to shine");
+  lcd_two_line_write((uint8_t *)"PianoSynth1 is",(uint8_t *)"ready to shine");
   uint16_t n;
   uint16_t m;
   m = (uint16_t) ( 4096 / DACBUFFERSIZE);
@@ -41,8 +41,6 @@ int main(void)
 		TriangleWaveTable[DACBUFFERSIZE - n-1] = result;
 	}
 	UpdateTimerPeriod();
-	//  	timerFreq = TIMER_CLOCK / TIMER6_PRESCALER; /* Timer tick is in Hz */
-	//timerPeriod = (uint16_t)( TIMERFREQ / fTimer );
 	RCC_Configuration();
 	NVIC_Configuration();
 	GPIO_Configuration();

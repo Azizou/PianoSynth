@@ -63,14 +63,14 @@ void lcd_init () {
   the LCD module for use.*/
   // set the relevant pins to outputs
   RCC->CFGR = RCC_CFGR_SW_HSE;
-  RCC->AHB1ENR = RCC_AHB1ENR_GPIOBEN|RCC_AHB1ENR_GPIOCEN;
+  RCC->AHB1ENR = RCC_AHB1ENR_GPIOAEN|RCC_AHB1ENR_GPIOCEN;
   RCC->CR |= RCC_CR_HSEON;
 
   GPIOC->MODER=GPIO_MODER_MODER6_0|GPIO_MODER_MODER7_0|GPIO_MODER_MODER8_0|GPIO_MODER_MODER9_0;
-  GPIOB->MODER=GPIO_MODER_MODER4_0|GPIO_MODER_MODER5_0;
+  GPIOA->MODER=GPIO_MODER_MODER1_0|GPIO_MODER_MODER2_0;
 
   GPIOC->OSPEEDR = GPIO_OSPEEDER_OSPEEDR6_1 | GPIO_OSPEEDER_OSPEEDR7_1 | GPIO_OSPEEDER_OSPEEDR8_1 | GPIO_OSPEEDER_OSPEEDR9_1;
-  GPIOB->OSPEEDR = GPIO_OSPEEDER_OSPEEDR4_1 | GPIO_OSPEEDER_OSPEEDR5_1;
+  GPIOA->OSPEEDR = GPIO_OSPEEDER_OSPEEDR1_1 | GPIO_OSPEEDER_OSPEEDR2_1;
 
   delay(30000); //allow the LCD 30 ms power up time
   // in case in 2nd nibble of 4 bit tansfer, this goes to 1st nibble
@@ -107,9 +107,9 @@ static void lcd_put (uint8_t character, enum TypeOfCharacter ch_type) {
     //and other common characters the ASCII code will produce correct display.
     //Refer to the Hitachi HD44780 datasheet for full character set information.
     if (ch_type == TEXT) {
-        GPIOB->BSRRL |= GPIO_BSRR_BS_5;// pull RS (PB5) high
+        GPIOA->BSRRL |= GPIO_BSRR_BS_2;// pull RS (PB5) high
     } else if (ch_type == COMMAND) {
-        GPIOB->BSRRH |= GPIO_BSRR_BS_5;// pull RS (PB5) low
+        GPIOA->BSRRH |= GPIO_BSRR_BS_2;// pull RS (PB5) low
     }
     // write upper nibble
     lcd_write4bits(character >> 4);
@@ -158,9 +158,9 @@ static void delay(uint32_t microseconds) {
 static void pulse_strobe (void) {
   //Pulse the strobe line of the LCD to indicate that data is ready.
   delay(1);
-  GPIOB->BSRRL |= GPIO_BSRR_BS_4;// pull E (PB4) high
+  GPIOA->BSRRL |= GPIO_BSRR_BS_1;// pull E (PB4) high
   delay(1);
-  GPIOB->BSRRH |= GPIO_BSRR_BS_4;// pull E (PB4) low
+  GPIOA->BSRRH |= GPIO_BSRR_BS_1;// pull E (PB4) low
   delay(1);
 }
 
