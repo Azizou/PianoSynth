@@ -7,8 +7,11 @@ void GPIO_Configuration(void)
   GPIO_InitTypeDef   GPIO_InitStructure;
   NVIC_InitTypeDef   NVIC_InitStructure;
   EXTI_InitTypeDef   EXTI_InitStructure;
-  /* Enable GPIOE, GPIOD, TIM3 and DAC clock */
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD | RCC_APB1Periph_TIM3, ENABLE);
+  /* Enable GPIOE, GPIOD clock */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD | , ENABLE);
+  /* Enable TIM3 clock */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  /* Enable DAC clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);
   /* Enable SYSCFG clock */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
