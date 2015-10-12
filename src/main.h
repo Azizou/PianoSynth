@@ -39,7 +39,7 @@ void UART_Configuration(void);
 //void Timer_Configuration(uint16_t wavPeriod, uint16_t preScaler);
 void DAC_Configuration(void);
 void delay_ms(uint32_t milli);
-void UpdateTimerPeriod();
+void UpdateTimerPeriod(float frequency);
 void setWave(int waveform);
 //void UpdateTimerFrequency();
 

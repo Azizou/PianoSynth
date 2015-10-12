@@ -177,7 +177,7 @@ void default_exti_handler(uint32_t line, char * message, uint8_t buttonID){
   {
 	 button_index = buttonID;
 	lcd_float_write((uint8_t *)message, getButtonFrequency(buttonID), (uint8_t *)"Hz");
-	UpdateTimerPeriod();
+	UpdateTimerPeriod(getButtonFrequency(buttonID));
 	Timer_Configuration();
 	delay_ms(debounce_delay);
 	EXTI_ClearITPendingBit(line);

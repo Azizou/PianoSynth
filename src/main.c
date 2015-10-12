@@ -40,7 +40,7 @@ int main(void)
 		TriangleWaveTable[n] = result;
 		TriangleWaveTable[DACBUFFERSIZE - n-1] = result;
 	}
-	UpdateTimerPeriod();
+	UpdateTimerPeriod(880);
 	//  	timerFreq = TIMER_CLOCK / TIMER6_PRESCALER; /* Timer tick is in Hz */
 	//timerPeriod = (uint16_t)( TIMERFREQ / fTimer );
 	RCC_Configuration();
@@ -99,8 +99,9 @@ void setWave(int waveform){
 
 
 
-void UpdateTimerPeriod(){
-	timerPeriod =  (uint16_t)( TIMERFREQ /(uint32_t)getButtonFrequency(button_index)*DACBUFFERSIZE);
+void UpdateTimerPeriod(float frequency){
+
+	timerPeriod =  (uint16_t)( TIMERFREQ / frequency * DACBUFFERSIZE);
 }
 
 void EVAL_AUDIO_TransferComplete_CallBack(uint32_t pBuffer, uint32_t Size){
