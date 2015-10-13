@@ -1,9 +1,8 @@
-/*
- * pitch.c
- *
- *  Created on: Sep 22, 2015
- *      Author: Poon Donohoe
+/**
+ *    PianoSynth
+ **** Pitch Table Interface ***
  */
+
 #include "pitch.h"
 
 // TODO: Implement variable keys and modes

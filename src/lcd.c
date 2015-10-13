@@ -1,3 +1,8 @@
+/**
+ *    PianoSynth
+ **** LCD Screen Interface ***
+ */
+
 /*
 Copyright (C) Samuel Ginsberg 2004
 Porting to STM32F0 dev board by James Gowans, 2014

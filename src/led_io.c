@@ -1,3 +1,8 @@
+/**
+ *    PianoSynth
+ **** Offboard LED Interface ***
+ */
+
 #include "led_io.h"
 
 GPIO_TypeDef* GPIO_00_PORT[LED0n] = {LED01_GPIO_PORT, LED02_GPIO_PORT, LED03_GPIO_PORT, LED04_GPIO_PORT, LED05_GPIO_PORT, LED06_GPIO_PORT,LED07_GPIO_PORT, LED08_GPIO_PORT, LED09_GPIO_PORT};
@@ -21,6 +26,18 @@ void LEDToggle(LED_TypDef Led)
   GPIO_00_PORT[Led]->ODR ^= GPIO_00_PIN[Led];
 }
 
+void LED_Init(){
+  LED_Init(LED00);
+  LED_Init(LED01);
+  LED_Init(LED02);
+  LED_Init(LED03);
+  LED_Init(LED04);
+  LED_Init(LED05);
+  LED_Init(LED06);
+  LED_Init(LED07);
+  LED_Init(LED08);
+  LED_Init(LED09);
+}
 void LED_Init(LED_TypDef Led){
   GPIO_InitTypeDef  GPIO_InitStructure;  
   /* Enable the GPIO_LED Clock */

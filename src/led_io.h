@@ -1,3 +1,8 @@
+/**
+ *    PianoSynth
+ **** LED Interface Definitions ***
+ */
+
 #ifndef _LED_IO_H
 #define _LED_IO_H
 #include "main.h"
@@ -50,6 +55,7 @@ typedef enum {
   LED09 = 9
 } LED_TypDef;
 
+void LED_Init(); 
 void LED_Init(LED_TypDef Led);                                 
 void LEDToggle(LED_TypDef Led);
 void LEDOff(LED_TypDef Led);

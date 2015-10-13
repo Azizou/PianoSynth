@@ -1,8 +1,6 @@
-/*
- * pitch.h
- *
- *  Created on: Sep 22, 2015
- *      Author: Poon Donohoe
+/**
+ *    PianoSynth
+ **** Pitch Table Definitions ***
  */
 
 #ifndef PITCH_H_
@@ -11,7 +9,6 @@
 
 
 float getButtonFrequency(int buttonID);
-
 
 #define 	KEY_C				0
 #define 	KEY_D				1
@@ -27,7 +24,6 @@ float getButtonFrequency(int buttonID);
 #define		MODE_MIXOLYDIAN		4
 #define		MODE_AEOLIAN		5
 #define		MODE_LOCRIAN		6
-
 
 #define 	OCTAVE_MULTIPLIER 	4
 
