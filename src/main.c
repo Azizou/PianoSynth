@@ -76,6 +76,7 @@ void TIM3_IRQHandler(void)
       //else LEDOff(...);
     }
 
+    /* If no button is pressed, display idle message */
     if(numButtonsPressed == 0){
       lcd_two_line_write((uint8_t *)"Idle mode",(uint8_t *)"waiting for event");
       TIM_Cmd(TIM6, DISABLE);
